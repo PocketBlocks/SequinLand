@@ -1,4 +1,4 @@
-Nukkit
+SequinLand
 ===================
 ![nukkit](https://github.com/Nukkit/Nukkit/blob/master/images/banner.png)
 
@@ -16,39 +16,26 @@ Nukkit
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-__A Nuclear-Powered Server Software For Minecraft: Pocket Edition__
-
-[![PayPayl donate button](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=magicdroidx%40gmail%2ecom&lc=US&item_name=Nukkit&currency_code=USD&bn=PP%2dDonationsBF%3apaypal%2ddonate%2dyellow%2esvg%3aNonHostedGuest)
-[![Gitter](https://img.shields.io/gitter/room/Nukkit/Nukkit.js.svg?style=flat)](https://gitter.im/Nukkit/Nukkit)
-[![Travis](https://img.shields.io/travis/Nukkit/Nukkit.svg?style=flat)](https://travis-ci.org/Nukkit/Nukkit)
+__A Nukkit fork that aims to add new and pretty features to Nukkit! (And sometimes pushes the changes to upstream :wink:)__
 
 Introduction
 -------------
 
-Nukkit is nuclear-powered server software for Minecraft: Pocket Edition.
-It has a few key advantages over other server software:
+SequinLand is a Nukkit fork that aims to add new and pretty features to Nukkit.
 
-* Written in Java, Nukkit is faster and more stable.
-* Having a friendly structure, it's easy to contribute to Nukkit's development and rewrite plugins from other platforms into Nukkit plugins.
+We try to improve the "Nukkit experience" by improving the "vanilla Nukkit" with new fixes, features and other stuff.
 
-Nukkit is **under improvement** yet, we welcome contributions. 
+Most of the "fixes, features and other stuff" are from PocketMine-MP and it's forks/spoons, but we also try to improve SequinLand by adding new and unseen features. (and also provide fixes for Nukkit)
 
-Get Nukkit & Plugins
+Of course, kudos to everyone and anyone that helped Nukkit to become what it is today, without them, Nukkit probably wouldn't even exist.
+
+When a feature is considered "stable", the feature is pushed to upstream as a pull request.
+
+Get SequinLand
 --------------------
 
-####Recommended Sites
+**CircleCI:** https://circleci.com/gh/PocketDreams/SequinLand/tree/master
 
-* __[Official Site](https://nukkit.io)__
-* __[Jar Download at Circle CI](https://circleci.com/gh/Nukkit/Nukkit/tree/master/)__ (**login required**)
-* __[Discussion](#discussion)__
-
-*Thank you for visiting our official sites. Our official websites are provided free of charge, and we do not like to place ads on the home page affecting your reading. If you like this project, please [donate to us](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=magicdroidx%40gmail%2ecom&lc=US&item_name=Nukkit&currency_code=USD&bn=PP%2dDonationsBF%3apaypal%2ddonate%2dyellow%2esvg%3aNonHostedGuest). All the donations will only be used for Nukkit websites and services.*
-
-
-####Unofficial Download Mirrors
-*These sites are provided by our users, Nukkit stuff are not responsible for the reliability of these sites. Jar files downloaded here are only for reference - to try the latest update or for commercial uses, compile by yourself.*
-
-* __[Jenkins by MengCraft](http://ci.mengcraft.com:8080/job/Nukkit/lastSuccessfulBuild/)__ (**UNOFFICIAL**)
 
 Build JAR file
 -------------
@@ -56,25 +43,8 @@ Build JAR file
 - `mvn clean`
 - `mvn package`
 
-Running
--------------
-Simply run `start.sh` or `start.cmd`, or execute `java -jar Nukkit.jar`.
+---
 
-Plugin API
--------------
-####**Example Plugin**
-Example Plugin which shows the API of Nukkit.
-
-* __[Example Plugin](http://github.com/Nukkit/ExamplePlugin)__
-
-Development Tools
------------------
-There're some tools for Nukkit developers.
-
-* __[FDevTools](https://github.com/fengberd/FDevTools)__ (**Load source and pack them easily**)
-* __[PocketServer](https://github.com/fengberd/MinecraftPEServer)__ (**Run Nukkit on android devices**)
-
-Discussion
--------------
-* __[Forums](https://forums.nukkit.io)__
-* __[百度 Nukkit 吧](http://tieba.baidu.com/f?kw=nukkit)__
+<p align="center">
+<img src="http://vignette2.wikia.nocookie.net/shantae/images/d/db/Fx_cine_shantae_pose_9.png/revision/latest?cb=20170102072829" alt="Shantae" width="300"></img>
+</p>

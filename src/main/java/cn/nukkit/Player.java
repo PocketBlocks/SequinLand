@@ -3445,7 +3445,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     }
 
                     BlockEntity t = this.level.getBlockEntity(pos);
-                    if (t instanceof BlockEntitySign) {
+                    if (t instanceof BlockEntitySpawnable) {
+                        BlockEntitySpawnable spawnable = (BlockEntitySpawnable) t;
                         CompoundTag nbt;
                         try {
                             nbt = NBTIO.read(blockEntityDataPacket.namedTag, ByteOrder.LITTLE_ENDIAN, true);
@@ -3453,28 +3454,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             throw new RuntimeException(e);
                         }
 
-                        if (!BlockEntity.SIGN.equals(nbt.getString("id"))) {
+                        if (!spawnable.updateCompoundTag(nbt, this)) {
                             ((BlockEntitySign) t).spawnTo(this);
-                        } else {
-                            SignChangeEvent signChangeEvent = new SignChangeEvent(t.getBlock(), this, new String[]{
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text1")) : nbt.getString("Text1"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text2")) : nbt.getString("Text2"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text3")) : nbt.getString("Text3"),
-                                    this.removeFormat ? TextFormat.clean(nbt.getString("Text4")) : nbt.getString("Text4")
-                            });
-
-                            if (!t.namedTag.contains("Creator") || !Objects.equals(this.getUniqueId().toString(), t.namedTag.getString("Creator"))) {
-                                signChangeEvent.setCancelled();
-                            }
-
-                            this.server.getPluginManager().callEvent(signChangeEvent);
-
-                            if (!signChangeEvent.isCancelled()) {
-                                ((BlockEntitySign) t).setText(signChangeEvent.getLine(0), signChangeEvent.getLine(1), signChangeEvent.getLine(2), signChangeEvent.getLine(3));
-                            } else {
-                                ((BlockEntitySign) t).spawnTo(this);
-                            }
-
                         }
                     }
                     break;

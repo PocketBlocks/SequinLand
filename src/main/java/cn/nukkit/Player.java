@@ -3047,17 +3047,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
-                    for (int i = 0; i < craftingEventPacket.input.length; i++) {
-                        Item inputItem = craftingEventPacket.input[i];
-                        if (inputItem.getDamage() == -1 || inputItem.getDamage() == 0xffff) {
-                            inputItem.setDamage(null);
-                        }
-
-                        if (i < 9 && inputItem.getId() > 0) {
-                            inputItem.setCount(1);
-                        }
-                    }
-
                     boolean canCraft = true;
 
                     if (craftingEventPacket.input.length == 0) {

@@ -12,7 +12,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.NumberTag;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -354,22 +353,7 @@ public abstract class BaseFullChunk implements FullChunk {
         int index = (z << 12) | (x << 8) | y;
         return this.tileList.containsKey(index) ? this.tileList.get(index) : null;
     }
-
-    @Override
-    public boolean isLoaded() {
-        return this.getProvider() != null && this.getProvider().isChunkLoaded(this.getX(), this.getZ());
-    }
-
-    @Override
-    public boolean load() throws IOException {
-        return this.load(true);
-    }
-
-    @Override
-    public boolean load(boolean generate) throws IOException {
-        return this.getProvider() != null && this.getProvider().getChunk(this.getX(), this.getZ(), true) != null;
-    }
-
+    
     @Override
     public boolean unload() throws Exception {
         return this.unload(true, true);

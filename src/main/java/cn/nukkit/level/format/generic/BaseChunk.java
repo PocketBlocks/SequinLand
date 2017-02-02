@@ -216,16 +216,6 @@ public abstract class BaseChunk extends BaseFullChunk implements Chunk {
     }
 
     @Override
-    public boolean load() throws IOException {
-        return this.load(true);
-    }
-
-    @Override
-    public boolean load(boolean generate) throws IOException {
-        return this.getProvider() != null && this.getProvider().getChunk(this.getX(), this.getZ(), true) != null;
-    }
-
-    @Override
     public byte[] getBlockIdArray() {
         ByteBuffer buffer = ByteBuffer.allocate(4096 * SECTION_COUNT);
         for (int y = 0; y < SECTION_COUNT; y++) {

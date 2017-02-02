@@ -3247,7 +3247,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                             slot = -1;
                             for (int index : this.inventory.getContents().keySet()) {
                                 Item i = this.inventory.getContents().get(index);
-                                if (ingredient.getId() != 0 && ingredient.deepEquals(i, ingredient.hasMeta()) && (i.getCount() - used[index]) >= 1) {
+                                if (ingredient.getId() != 0 && ingredient.equals(i, ingredient.hasMeta(), ingredient.hasCompoundTag()) && (i.getCount() - used[index]) >= 1) {
                                     slot = index;
                                     used[index]++;
                                     break;

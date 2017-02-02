@@ -237,12 +237,19 @@ public class CompoundTag extends Tag {
     }
 
     /**
+     * @deprecated Use {@link #exists(String)}
+     */
+    public boolean exist(String name) {
+        return exists(name);
+    }
+    
+    /**
      * Check existence of NBT tag
      *
      * @param name - NBT tag Id.
      * @return - true, if tag exists
      */
-    public boolean exist(String name) {
+    public boolean exists(String name) {
         return tags.containsKey(name);
     }
 }

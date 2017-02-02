@@ -7,6 +7,28 @@ import cn.nukkit.block.BlockDirt;
 import cn.nukkit.block.BlockFire;
 import cn.nukkit.block.BlockWater;
 import cn.nukkit.entity.data.*;
+import cn.nukkit.entity.item.EntityBoat;
+import cn.nukkit.entity.item.EntityExpBottle;
+import cn.nukkit.entity.item.EntityFallingBlock;
+import cn.nukkit.entity.item.EntityItem;
+import cn.nukkit.entity.item.EntityMinecartEmpty;
+import cn.nukkit.entity.item.EntityPainting;
+import cn.nukkit.entity.item.EntityPotion;
+import cn.nukkit.entity.item.EntityPrimedTNT;
+import cn.nukkit.entity.item.EntityXPOrb;
+import cn.nukkit.entity.mob.EntityCreeper;
+import cn.nukkit.entity.passive.EntityChicken;
+import cn.nukkit.entity.passive.EntityCow;
+import cn.nukkit.entity.passive.EntityOcelot;
+import cn.nukkit.entity.passive.EntityPig;
+import cn.nukkit.entity.passive.EntityRabbit;
+import cn.nukkit.entity.passive.EntitySheep;
+import cn.nukkit.entity.passive.EntityVillager;
+import cn.nukkit.entity.passive.EntityWolf;
+import cn.nukkit.entity.projectile.EntityArrow;
+import cn.nukkit.entity.projectile.EntityEnderPearl;
+import cn.nukkit.entity.projectile.EntitySnowball;
+import cn.nukkit.entity.weather.EntityLightning;
 import cn.nukkit.event.entity.*;
 import cn.nukkit.event.player.PlayerInteractEvent;
 import cn.nukkit.event.player.PlayerTeleportEvent;
@@ -1789,5 +1811,38 @@ public abstract class Entity extends Location implements Metadatable {
         int hash = 7;
         hash = (int) (29 * hash + this.getId());
         return hash;
+    }
+    
+    public static void init() {
+        Entity.registerEntity("Arrow", EntityArrow.class);
+        Entity.registerEntity("Item", EntityItem.class);
+        Entity.registerEntity("FallingSand", EntityFallingBlock.class);
+        Entity.registerEntity("PrimedTnt", EntityPrimedTNT.class);
+        Entity.registerEntity("Snowball", EntitySnowball.class);
+        Entity.registerEntity("EnderPearl", EntityEnderPearl.class);
+        Entity.registerEntity("Painting", EntityPainting.class);
+        //todo mobs
+        Entity.registerEntity("Creeper", EntityCreeper.class);
+        //TODO: more mobs
+        Entity.registerEntity("Chicken", EntityChicken.class);
+        Entity.registerEntity("Cow", EntityCow.class);
+        Entity.registerEntity("Pig", EntityPig.class);
+        Entity.registerEntity("Rabbit", EntityRabbit.class);
+        Entity.registerEntity("Sheep", EntitySheep.class);
+        Entity.registerEntity("Wolf", EntityWolf.class);
+        Entity.registerEntity("Ocelot", EntityOcelot.class);
+        Entity.registerEntity("Villager", EntityVillager.class);
+
+        Entity.registerEntity("ThrownExpBottle", EntityExpBottle.class);
+        Entity.registerEntity("XpOrb", EntityXPOrb.class);
+        Entity.registerEntity("ThrownPotion", EntityPotion.class);
+
+        Entity.registerEntity("Human", EntityHuman.class, true);
+
+        Entity.registerEntity("MinecartRideable", EntityMinecartEmpty.class);
+        // TODO: 2016/1/30 all finds of minecart
+        Entity.registerEntity("Boat", EntityBoat.class);
+
+        Entity.registerEntity("Lightning", EntityLightning.class);
     }
 }

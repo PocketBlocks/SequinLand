@@ -4161,6 +4161,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             pk.eid = 0;
             this.dataPacket(pk);
         }
+        this.newPosition = null;
     }
 
     @Override

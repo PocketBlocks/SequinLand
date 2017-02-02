@@ -39,6 +39,12 @@ public class LoginPacket extends DataPacket {
     @Override
     public void decode() {
         this.protocol = this.getInt();
+        
+        if (this.protocol != ProtocolInfo.CURRENT_PROTOCOL) {
+            this.setBuffer(null);
+            return;
+        }
+        
         this.gameEdition = (byte) this.getByte();
         byte[] str;
         try {

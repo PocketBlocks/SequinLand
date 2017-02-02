@@ -1157,6 +1157,11 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     @Override
+    public boolean isFireProof() {
+        return this.isCreative();
+    }
+    
+    @Override
     public Item[] getDrops() {
         if (!this.isCreative()) {
             return super.getDrops();

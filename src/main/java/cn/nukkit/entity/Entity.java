@@ -213,7 +213,6 @@ public abstract class Entity extends Location implements Metadatable {
 
     public int noDamageTicks;
     public boolean justCreated;
-    public boolean fireProof;
     public boolean invulnerable;
 
     protected Server server;
@@ -971,10 +970,11 @@ public abstract class Entity extends Location implements Metadatable {
         }
 
         if (this.fireTicks > 0) {
-            if (this.fireProof) {
-                this.fireTicks -= 4 * tickDiff;
-                if (this.fireTicks < 0) {
-                    this.fireTicks = 0;
+            if (this.isFireProof()) {
+                if (this.fireTicks > 1) {
+                    this.fireTicks = 1;
+                } else {
+                    this.fireTicks -= 1;
                 }
             } else {
                 if (!this.hasEffect(Effect.FIRE_RESISTANCE) && ((this.fireTicks % 20) == 0 || tickDiff > 20)) {
@@ -1102,6 +1102,10 @@ public abstract class Entity extends Location implements Metadatable {
         }
     }
 
+    public boolean isFireProof() {
+        return false;
+    }
+    
     public Integer getDirection() {
         double rotation = (this.yaw - 90) % 360;
         if (rotation < 0) {

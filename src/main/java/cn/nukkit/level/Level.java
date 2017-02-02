@@ -1504,6 +1504,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void computeRemoveBlockLight(int x, int y, int z, int currentLight, Queue<Object[]> queue,
                                          Queue<Vector3> spreadQueue, Map<BlockVector3, Boolean> visited, Map<BlockVector3, Boolean> spreadVisited) {
+        if (y < 0) return;
         int current = this.getBlockLightAt(x, y, z);
         BlockVector3 index = Level.blockHash(x, y, z);
         if (current != 0 && current < currentLight) {
@@ -1525,6 +1526,7 @@ public class Level implements ChunkManager, Metadatable {
 
     private void computeSpreadBlockLight(int x, int y, int z, int currentLight, Queue<Vector3> queue,
                                          Map<BlockVector3, Boolean> visited) {
+        if (y < 0) return;
         int current = this.getBlockLightAt(x, y, z);
         BlockVector3 index = Level.blockHash(x, y, z);
 

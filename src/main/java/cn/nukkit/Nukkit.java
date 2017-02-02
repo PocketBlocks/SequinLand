@@ -27,10 +27,6 @@ public class Nukkit {
     public final static String VERSION = "1.0dev-SequinLand";
     public final static String API_VERSION = "1.0.0";
     public final static String CODENAME = "Risky Boots";
-    @Deprecated
-    public final static String MINECRAFT_VERSION = ProtocolInfo.MINECRAFT_VERSION;
-    @Deprecated
-    public final static String MINECRAFT_VERSION_NETWORK = ProtocolInfo.MINECRAFT_VERSION_NETWORK;
 
     public final static String PATH = System.getProperty("user.dir") + "/";
     public final static String DATA_PATH = System.getProperty("user.dir") + "/";

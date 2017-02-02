@@ -291,12 +291,14 @@ public abstract class Entity extends Location implements Metadatable {
         if (this.namedTag.contains("ActiveEffects")) {
             ListTag<CompoundTag> effects = this.namedTag.getList("ActiveEffects", CompoundTag.class);
             for (CompoundTag e : effects.getAll()) {
+                int amplifier = e.getByte("Amplifier") & 0xff; // 0-255 only
+                
                 Effect effect = Effect.getEffect(e.getByte("Id"));
                 if (effect == null) {
                     continue;
                 }
 
-                effect.setAmplifier(e.getByte("Amplifier")).setDuration(e.getInt("Duration")).setVisible(e.getBoolean("showParticles"));
+                effect.setAmplifier(amplifier).setDuration(e.getInt("Duration")).setVisible(e.getBoolean("showParticles"));
 
                 this.addEffect(effect);
             }

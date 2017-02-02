@@ -150,7 +150,7 @@ public class Effect implements Cloneable {
     }
 
     public Effect setAmplifier(int amplifier) {
-        this.amplifier = amplifier;
+        this.amplifier = amplifier & 0xff;
         return this;
     }
 

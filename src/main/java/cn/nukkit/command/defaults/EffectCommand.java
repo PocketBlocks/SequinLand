@@ -78,6 +78,13 @@ public class EffectCommand extends Command {
         if (args.length >= 4) {
             try {
                 amplification = Integer.valueOf(args[3]);
+                if (amplification > 255) {
+                    sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.num.tooBig", new String[] { args[3], "255" }));
+                    return true;
+                } else if (0 > amplification) {
+                    sender.sendMessage(new TranslationContainer(TextFormat.RED + "%commands.generic.num.tooSmall", new String[] { args[3], "0" }));
+                    return true;
+                }
             } catch (NumberFormatException a) {
                 sender.sendMessage(new TranslationContainer("commands.generic.usage", this.usageMessage));
                 return true;

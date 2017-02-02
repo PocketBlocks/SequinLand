@@ -220,6 +220,8 @@ public class Level implements ChunkManager, Metadatable {
     private Class<? extends Generator> generator;
     private Generator generatorInstance;
 
+    private boolean closed = false;
+    
     public final java.util.Random rand = new java.util.Random();
     private boolean raining = false;
     private int rainTime = 0;
@@ -427,6 +429,10 @@ public class Level implements ChunkManager, Metadatable {
         return this.levelId;
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+    
     public void close() {
         if (this.getAutoSave()) {
             this.save();

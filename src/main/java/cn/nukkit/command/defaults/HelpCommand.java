@@ -32,7 +32,7 @@ public class HelpCommand extends VanillaCommand {
         }
         String command = "";
         int pageNumber = 1;
-        int pageHeight = 5;
+        int pageHeight = 7;
         if (args.length != 0) {
             try {
                 pageNumber = Integer.valueOf(args[args.length - 1]);

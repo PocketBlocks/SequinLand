@@ -1333,6 +1333,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         double distanceSquared = newPos.distanceSquared(this);
         boolean revert = false;
         if ((distanceSquared / ((double) (tickDiff * tickDiff))) > 100 && (newPos.y - this.y) > -5) {
+            this.getServer().getLogger().warning(this.getName() + " moved too fast, reverting movement");
             revert = true;
         } else {
             if (this.chunk == null || !this.chunk.isGenerated()) {
@@ -1363,11 +1364,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             double diffX = this.x - newPos.x;
             double diffY = this.y - newPos.y;
             double diffZ = this.z - newPos.z;
-
-            double yS = 0.5 + this.ySize;
-            if (diffY >= -yS || diffY <= yS) {
-                diffY = 0;
-            }
 
             if (diffX != 0 || diffY != 0 || diffZ != 0) {
                 if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {

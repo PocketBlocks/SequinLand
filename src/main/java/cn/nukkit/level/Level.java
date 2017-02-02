@@ -306,6 +306,12 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkTickList.clear();
         this.clearChunksOnTick = (boolean) this.server.getConfig("chunk-ticking.clear-tick-list", true);
         this.cacheChunks = (boolean) this.server.getConfig("chunk-sending.cache-chunks", false);
+        List<Integer> dontTickBlocks = this.server.getConfig().getIntegerList("chunk-ticking.disable-block-ticking");
+        if (dontTickBlocks != null) {
+            for (int id : dontTickBlocks) {
+                randomTickBlocks.remove(id);
+            }
+        }
         this.temporalPosition = new Position(0, 0, 0, this);
         this.temporalVector = new Vector3(0, 0, 0);
         this.tickRate = 1;
@@ -1003,6 +1009,24 @@ public class Level implements ChunkManager, Metadatable {
         this.chunkCache.remove(Level.chunkHash(chunkX, chunkZ));
     }
 
+    /**
+     * Adds a block to be randomly ticked by the server
+     * 
+     * @param id  Block ID
+     */
+    public void addRandomTickedBlock(int id) {
+        this.randomTickBlocks.put(id, Block.get(id).getClass());
+    }
+    
+    /**
+     * Removes a block to be randomy ticked by the server
+     * 
+     * @param id  Block ID
+     */
+    public void removeRandomTickedBlock(int id) {
+        this.randomTickBlocks.remove(id);
+    }
+    
     private void tickChunks() {
         if (this.chunksPerTicks <= 0 || this.loaders.isEmpty()) {
             this.chunkTickList = new HashMap<>();

@@ -31,6 +31,19 @@ Of course, kudos to everyone and anyone that helped Nukkit to become what it is 
 
 When a feature is considered "stable", the feature is pushed to upstream as a pull request.
 
+Why fork Nukkit?
+-------------
+
+SequinLand was forked because of the fact that upstream does not accept many contributions that are intended to better the ecosystem. Simply put, SequinLand aims to better
+the ecosystem by allowing changes to be exposed to a wider audience more quickly.
+
+SequinLand will still track upstream Nukkit and merge changes as needed.
+
+Servers using SequinLand
+--------------------
+
+None yet!
+
 Get SequinLand
 --------------------
 

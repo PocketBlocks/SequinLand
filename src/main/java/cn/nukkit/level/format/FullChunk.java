@@ -3,6 +3,7 @@ package cn.nukkit.level.format;
 import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.entity.Entity;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -110,6 +111,12 @@ public interface FullChunk extends Cloneable {
     Map<Long, BlockEntity> getBlockEntities();
 
     BlockEntity getTile(int x, int y, int z);
+
+    boolean isLoaded();
+
+    boolean load() throws IOException;
+
+    boolean load(boolean generate) throws IOException;
 
     boolean unload() throws Exception;
 

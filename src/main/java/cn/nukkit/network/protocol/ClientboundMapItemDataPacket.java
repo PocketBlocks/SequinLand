@@ -21,8 +21,8 @@ public class ClientboundMapItemDataPacket extends DataPacket {
     public int offsetZ; // ^^^
     public byte[] data; // ubyte[]
     
-    public static final int UPDATE = 6;
-    public static final int FULL = 4;
+    public static final int UPDATE = 4;
+    public static final int FULL = 6;
     
     @Override
     public byte pid() {

@@ -36,6 +36,7 @@ public class ClientboundMapItemDataPacket extends DataPacket {
 
     @Override
     public void encode() {
+        this.reset();
         this.putVarLong(mapId);
         this.putUnsignedVarInt(unknown);
         this.putUnsignedVarInt(unknown2);

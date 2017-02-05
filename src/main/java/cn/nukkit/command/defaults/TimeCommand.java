@@ -26,7 +26,7 @@ public class TimeCommand extends VanillaCommand {
         });
         this.commandParameters.put("2args", new CommandParameter[]{
                 new CommandParameter("add|set", CommandParameter.ARG_TYPE_STRING, false),
-                new CommandParameter("value", CommandParameter.ARG_TYPE_INT, false)
+                new CommandParameter("value", CommandParameter.ARG_TYPE_RAW_TEXT, false)
         });
     }
 

@@ -44,6 +44,24 @@ public class BlockEntitySign extends BlockEntitySpawnable {
         return blockID == Block.SIGN_POST || blockID == Block.WALL_SIGN;
     }
 
+    /**
+     * Sets the line of text at the specified index.
+     * 
+     * For example, setLine(0, "Line One") will set the first line of text to "Line One".
+     * 
+     * @param index  Line number to set the text at, starting from 0
+     * @param line  New text to set at the specified index
+     * @throws IndexOutOfBoundsException If the index is out of the range 0..3
+     */
+    public void setText(int index, String line) {
+        if (0 > index || index > 3) throw new IndexOutOfBoundsException();
+        String line1 = (index == 0 ? line : getText()[0]);
+        String line2 = (index == 1 ? line : getText()[1]);
+        String line3 = (index == 2 ? line : getText()[2]);
+        String line4 = (index == 3 ? line : getText()[3]);
+        this.setText(line1, line2, line3, line4);
+    }
+    
     public boolean setText() {
         return this.setText("");
     }

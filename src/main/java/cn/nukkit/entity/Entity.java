@@ -1846,5 +1846,7 @@ public abstract class Entity extends Location implements Metadatable {
         Entity.registerEntity("Boat", EntityBoat.class);
 
         Entity.registerEntity("Lightning", EntityLightning.class);
+        
+        Entity.registerEntity("EnderCrystal", EntityEnderCrystal.class);
     }
 }

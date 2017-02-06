@@ -10,7 +10,7 @@ import cn.nukkit.nbt.tag.CompoundTag;
 /**
  * author: Angelic47 Nukkit Project
  */
-public class BlockBeacon extends BlockSolid {
+public class BlockBeacon extends BlockTransparent {
 
     public BlockBeacon() {
         this(0);
@@ -35,6 +35,11 @@ public class BlockBeacon extends BlockSolid {
         return 15;
     }
 
+    @Override
+    public int getLightLevel() {
+        return 15;
+    }
+    
     @Override
     public int getToolType() {
         return ItemTool.TYPE_PICKAXE;

@@ -1,6 +1,7 @@
 package cn.nukkit.level;
 
 import cn.nukkit.block.Block;
+import cn.nukkit.blockentity.BlockEntity;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.utils.LevelException;
 
@@ -74,6 +75,51 @@ public class Position extends Vector3 {
         return Position.fromObject(super.getSide(side, step), this.level);
     }
 
+    /**
+     * Gets the Block Entity of this position
+     * 
+     * @return  block entity
+     */
+    public BlockEntity getBlockEntity() {
+        return this.getLevel().getBlockEntity(this);
+    }
+    
+    /**
+     * Gets the Block ID of this position
+     * 
+     * @return  block ID
+     */
+    public int getBlockId() {
+        return this.getLevel().getBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+    }
+    
+    /**
+     * Sets the Block ID of this position
+     * 
+     * @param id  ID to change this block to
+     */
+    public void setBlockId(int id) {
+        this.getLevel().setBlockIdAt(this.getFloorX(), this.getFloorY(), this.getFloorZ(), id);
+    }
+    
+    /**
+     * Gets the Block Data of this position
+     * 
+     * @return  block data
+     */
+    public int getBlockData() {
+        return this.getLevel().getBlockDataAt(this.getFloorX(), this.getFloorY(), this.getFloorZ());
+    }
+    
+    /**
+     * Sets the Block Data of this position
+     * 
+     * @param data  data to change this block to
+     */
+    public void setBlockData(int data) {
+        this.getLevel().setBlockDataAt(this.getFloorX(), this.getFloorY(), this.getFloorZ(), data);
+    }
+    
     @Override
     public String toString() {
         return "Position(level=" + (this.isValid() ? this.getLevel().getName() : "null") + ",x=" + this.x + ",y=" + this.y + ",z=" + this.z + ")";

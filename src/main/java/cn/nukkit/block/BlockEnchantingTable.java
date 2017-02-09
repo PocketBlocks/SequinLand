@@ -17,7 +17,7 @@ import java.util.Map;
  * Created on 2015/11/22 by CreeperFace.
  * Package cn.nukkit.block in project Nukkit .
  */
-public class BlockEnchantingTable extends BlockSolid {
+public class BlockEnchantingTable extends BlockTransparent {
     public BlockEnchantingTable() {
         this(0);
     }
@@ -51,6 +51,11 @@ public class BlockEnchantingTable extends BlockSolid {
         return 6000;
     }
 
+    @Override
+    public int getLightLevel() {
+        return 12;
+    }
+    
     @Override
     public boolean canBeActivated() {
         return true;

@@ -1996,7 +1996,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
                     AsyncPlayerPreLoginEvent asyncPlayerPreLoginEvent = new AsyncPlayerPreLoginEvent(this, "Plugin reason");
-                    CompletableFuture.runAsync(() -> this.server.getPluginManager().callEvent(asyncPlayerPreLoginEvent)).thenRun(() -> this.onPlayerPreLogin());
+                    CompletableFuture.runAsync(() -> this.server.getPluginManager().callEvent(asyncPlayerPreLoginEvent)).thenRun(() -> { 
+                        if (asyncPlayerPreLoginEvent.isCancelled()) {
+                            this.close("", asyncPlayerPreLoginEvent.getKickMessage());
+                            return;
+                        }
+                        this.onPlayerPreLogin(); 
+                    });
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
                     if (this.teleportPosition != null) {

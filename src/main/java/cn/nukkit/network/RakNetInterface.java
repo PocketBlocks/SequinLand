@@ -9,6 +9,7 @@ import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.raknet.RakNet;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
+import cn.nukkit.raknet.protocol.PacketReliability;
 import cn.nukkit.raknet.protocol.packet.PING_DataPacket;
 import cn.nukkit.raknet.server.RakNetServer;
 import cn.nukkit.raknet.server.ServerHandler;
@@ -249,7 +250,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                     packet.encapsulatedPacket.identifierACK = null;
                     packet.encapsulatedPacket.buffer = Binary.appendBytes((byte) 0xfe, buffer);
                     if (packet.getChannel() != 0) {
-                        packet.encapsulatedPacket.reliability = 3;
+                        packet.encapsulatedPacket.reliability = PacketReliability.RELIABLE_ORDERED;
                         packet.encapsulatedPacket.orderChannel = packet.getChannel();
                         packet.encapsulatedPacket.orderIndex = 0;
                     } else {
@@ -269,7 +270,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                 pk = new EncapsulatedPacket();
                 pk.buffer = Binary.appendBytes((byte) 0xfe, buffer);
                 if (packet.getChannel() != 0) {
-                    packet.reliability = 3;
+                    packet.reliability = PacketReliability.RELIABLE_ORDERED;
                     packet.orderChannel = packet.getChannel();
                     packet.orderIndex = 0;
                 } else {

@@ -67,6 +67,8 @@ import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
+import net.pocketdreams.sequinland.event.player.AsyncPlayerPreLoginEvent;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
@@ -74,6 +76,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -1992,9 +1995,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                         break;
                     }
-
-                    this.onPlayerPreLogin();
-
+                    AsyncPlayerPreLoginEvent asyncPlayerPreLoginEvent = new AsyncPlayerPreLoginEvent(this, "Plugin reason");
+                    CompletableFuture.runAsync(() -> this.server.getPluginManager().callEvent(asyncPlayerPreLoginEvent)).thenRun(() -> this.onPlayerPreLogin());
                     break;
                 case ProtocolInfo.MOVE_PLAYER_PACKET:
                     if (this.teleportPosition != null) {

@@ -4,6 +4,7 @@ import cn.nukkit.raknet.RakNet;
 import cn.nukkit.raknet.protocol.DataPacket;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.raknet.protocol.Packet;
+import cn.nukkit.raknet.protocol.PacketReliability;
 import cn.nukkit.raknet.protocol.packet.*;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
@@ -248,14 +249,14 @@ public class Session {
             this.needACK.put(packet.identifierACK, new HashMap<>());
         }
 
-        if (packet.reliability == 2 ||
-                packet.reliability == 3 ||
-                packet.reliability == 4 ||
-                packet.reliability == 6 ||
-                packet.reliability == 7) {
+        if (packet.reliability == PacketReliability.RELIABLE ||
+                packet.reliability == PacketReliability.RELIABLE_ORDERED ||
+                packet.reliability == PacketReliability.RELIABLE_SEQUENCED ||
+                packet.reliability == PacketReliability.RELIABLE_ORDERED_WITH_ACK_RECEIPT ||
+                packet.reliability == PacketReliability.RELIABLE_ORDERED_WITH_ACK_RECEIPT) {
             packet.messageIndex = this.messageIndex++;
 
-            if (packet.reliability == 3) {
+            if (packet.reliability == PacketReliability.RELIABLE_ORDERED) {
                 int index = this.channelIndex.get(packet.orderChannel) + 1;
                 packet.orderIndex = index;
                 channelIndex.put(packet.orderChannel, index);
@@ -279,7 +280,7 @@ public class Session {
                 } else {
                     pk.messageIndex = packet.messageIndex;
                 }
-                if (pk.reliability == 3) {
+                if (pk.reliability == PacketReliability.RELIABLE_ORDERED) {
                     pk.orderChannel = packet.orderChannel;
                     pk.orderIndex = packet.orderIndex;
                 }
@@ -393,7 +394,7 @@ public class Session {
                     pk.encode();
 
                     EncapsulatedPacket sendPacket = new EncapsulatedPacket();
-                    sendPacket.reliability = 0;
+                    sendPacket.reliability = PacketReliability.UNRELIABLE;
                     sendPacket.buffer = pk.buffer;
                     this.addToQueue(sendPacket, RakNet.PRIORITY_IMMEDIATE);
                 } else if (id == CLIENT_HANDSHAKE_DataPacket.ID) {
@@ -419,7 +420,7 @@ public class Session {
                 pk.encode();
 
                 EncapsulatedPacket sendPacket = new EncapsulatedPacket();
-                sendPacket.reliability = 0;
+                sendPacket.reliability = PacketReliability.UNRELIABLE;
                 sendPacket.buffer = pk.buffer;
                 this.addToQueue(sendPacket);
 

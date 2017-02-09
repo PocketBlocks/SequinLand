@@ -52,13 +52,13 @@ public class EncapsulatedPacket implements Cloneable {
             packet.identifierACK = null;
         }
 
-        if (packet.reliability > 0) {
-            if (packet.reliability >= 2 && packet.reliability != 5) {
+        if (packet.reliability > PacketReliability.UNRELIABLE) {
+            if (packet.reliability >= PacketReliability.UNRELIABLE && packet.reliability != PacketReliability.UNRELIABLE_WITH_ACK_RECEIPT) {
                 packet.messageIndex = Binary.readLTriad(Binary.subBytes(binary, offset, 3));
                 offset += 3;
             }
 
-            if (packet.reliability <= 4 && packet.reliability != 2) {
+            if (packet.reliability <= PacketReliability.RELIABLE_SEQUENCED && packet.reliability != PacketReliability.RELIABLE) {
                 packet.orderIndex = Binary.readLTriad(Binary.subBytes(binary, offset, 3));
                 offset += 3;
                 packet.orderChannel = binary[offset++] & 0xff;
@@ -100,11 +100,11 @@ public class EncapsulatedPacket implements Cloneable {
                 stream.write(Binary.writeShort(buffer.length << 3));
             }
 
-            if (reliability > 0) {
-                if (reliability >= 2 && reliability != 5) {
+            if (reliability > PacketReliability.UNRELIABLE) {
+                if (reliability >= PacketReliability.RELIABLE && reliability != PacketReliability.UNRELIABLE_WITH_ACK_RECEIPT) {
                     stream.write(Binary.writeLTriad(messageIndex == null ? 0 : messageIndex));
                 }
-                if (reliability <= 4 && reliability != 2) {
+                if (reliability <= PacketReliability.RELIABLE_SEQUENCED && reliability != PacketReliability.RELIABLE) {
                     stream.write(Binary.writeLTriad(orderIndex));
                     stream.write((byte) (orderChannel & 0xff));
                 }

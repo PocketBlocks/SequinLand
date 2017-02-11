@@ -2810,22 +2810,26 @@ public class Level implements ChunkManager, Metadatable {
             long now = System.currentTimeMillis();
 
             for (Long index : new ArrayList<>(this.unloadQueue.keySet())) {
-                long time = this.unloadQueue.get(index);
-
-                int X = getHashX(index);
-                int Z = getHashZ(index);
-
-                if (!force) {
-                    if (maxUnload <= 0) {
-                        break;
-                    } else if (time > (now - 30000)) {
-                        continue;
+                try {
+                    long time = this.unloadQueue.get(index);
+    
+                    int X = getHashX(index);
+                    int Z = getHashZ(index);
+    
+                    if (!force) {
+                        if (maxUnload <= 0) {
+                            break;
+                        } else if (time > (now - 30000)) {
+                            continue;
+                        }
                     }
-                }
-
-                if (this.unloadChunk(X, Z, true)) {
-                    this.unloadQueue.remove(index);
-                    --maxUnload;
+    
+                    if (this.unloadChunk(X, Z, true)) {
+                        this.unloadQueue.remove(index);
+                        --maxUnload;
+                    }
+                } catch (Exception e) {
+                    
                 }
             }
         }

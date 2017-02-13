@@ -4506,6 +4506,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     private boolean foodEnabled = true;
+    public long rakNetGlobalId;
 
     public boolean isFoodEnabled() {
         return !(this.isCreative() || this.isSpectator()) && this.foodEnabled;

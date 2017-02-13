@@ -1373,7 +1373,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             double diffY = this.y - newPos.y;
             double diffZ = this.z - newPos.z;
 
-            
             if (this.getLevel().equals(this.getLevel())) {
                 if (diffX != 0 || diffY != 0 || diffZ != 0) {
                     if (this.checkMovement && !server.getAllowFlight() && this.isSurvival()) {

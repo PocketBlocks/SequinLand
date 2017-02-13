@@ -4,6 +4,7 @@ import cn.nukkit.entity.Entity;
 import cn.nukkit.entity.data.*;
 import cn.nukkit.item.Item;
 import cn.nukkit.math.BlockVector3;
+import cn.nukkit.math.NukkitMath;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -247,17 +248,35 @@ public class Binary {
     }
 
     public static float readFloat(byte[] bytes) {
-        return Float.intBitsToFloat(readInt(bytes));
+        return readFloat(bytes, -1);
     }
 
+    public static float readFloat(byte[] bytes, int accuracy) {
+        float val = Float.intBitsToFloat(readInt(bytes));
+        if (accuracy > -1) {
+            return (float) NukkitMath.round(val, accuracy);
+        } else {
+            return val;
+        }
+    }
+    
     public static byte[] writeFloat(float f) {
         return writeInt(Float.floatToIntBits(f));
     }
 
     public static float readLFloat(byte[] bytes) {
-        return Float.intBitsToFloat(readLInt(bytes));
+        return readLFloat(bytes, -1);
     }
 
+    public static float readLFloat(byte[] bytes, int accuracy) {
+        float val = Float.intBitsToFloat(readLInt(bytes));
+        if (accuracy > -1) {
+            return (float) NukkitMath.round(val, accuracy);
+        } else {
+            return val;
+        }
+    }
+    
     public static byte[] writeLFloat(float f) {
         return writeLInt(Float.floatToIntBits(f));
     }

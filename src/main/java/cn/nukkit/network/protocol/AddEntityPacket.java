@@ -1,5 +1,8 @@
 package cn.nukkit.network.protocol;
 
+import java.util.jar.Attributes;
+
+import cn.nukkit.entity.Attribute;
 import cn.nukkit.entity.data.EntityMetadata;
 import cn.nukkit.utils.Binary;
 
@@ -26,7 +29,7 @@ public class AddEntityPacket extends DataPacket {
     public float speedZ;
     public float yaw;
     public float pitch;
-    public int modifiers;
+    public Attribute[] attributes = new Attribute[0];
     public EntityMetadata metadata = new EntityMetadata();
     public final Object[][] links = new Object[0][3];
 
@@ -45,7 +48,13 @@ public class AddEntityPacket extends DataPacket {
         this.putVector3f(this.speedX, this.speedY, this.speedZ);
         this.putLFloat(this.pitch * (256f / 360f));
         this.putLFloat(this.yaw * (256f / 360f));
-        this.putUnsignedVarInt(this.modifiers);
+        this.putUnsignedVarInt(attributes.length);
+        for (Attribute attribute : attributes) {
+            this.putString(attribute.getName());
+            this.putLFloat(attribute.getMinValue());
+            this.putLFloat(attribute.getValue());
+            this.putLFloat(attribute.getMaxValue());
+        }
         this.put(Binary.writeMetadata(this.metadata));
         this.putUnsignedVarInt(this.links.length);
         for (Object[] link : this.links) {

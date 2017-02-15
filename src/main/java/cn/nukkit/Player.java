@@ -68,6 +68,7 @@ import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import net.pocketdreams.sequinland.event.player.AsyncPlayerPreLoginEvent;
+import net.pocketdreams.sequinland.event.player.PlayerTransferEvent;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -4549,18 +4550,40 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
         this.setMovementSpeed(this.movementSpeed);
     }
-
-    public void transfer(InetSocketAddress address) {
-        String hostName = address.getHostName();
-        int port = address.getPort();
-        TransferPacket pk = new TransferPacket();
-        pk.address = hostName;
-        pk.port = port;
-        this.dataPacket(pk);
-        String message = "tranferred to " + address + ":" + port;
-        this.close(message, message, false);
+    
+    /**
+     * Transfers a player to another server.
+     *
+     * @param address  The InetSocketAddress of the destination server
+     *
+     * @return if transfer was successful.
+     */
+    public boolean transfer(InetSocketAddress address) {
+        return transfer(address.getHostName(), address.getPort());
     }
 
+    /**
+     * Transfers a player to another server.
+     *
+     * @param address  The IP address or hostname of the destination server
+     * @param port  The destination port, defaults to 19132
+     *
+     * @return if transfer was successful.
+     */
+    public boolean transfer(String address, int port) {
+        PlayerTransferEvent ev;
+        this.getServer().getPluginManager().callEvent(ev = new PlayerTransferEvent(this, address, port));
+        if (!ev.isCancelled()) {
+            TransferPacket pk = new TransferPacket();
+            pk.address = address;
+            pk.port = port;
+            this.dataPacket(pk);
+            this.close(this.getDisplayName() + " transferred to another server", "transferred to another server", false);
+            return true;
+        }
+        return false;
+    }
+    
     public String getDeviceModel() {
         return deviceModel;
     }

@@ -69,6 +69,7 @@ import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
 import net.pocketdreams.sequinland.event.player.AsyncPlayerPreLoginEvent;
 import net.pocketdreams.sequinland.event.player.PlayerTransferEvent;
+import net.pocketdreams.sequinland.utils.OperatingSystem;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -207,6 +208,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private String deviceModel;
 
+    private OperatingSystem operatingSystem;
+    
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
     }
@@ -1944,6 +1947,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
+                    this.operatingSystem = OperatingSystem.getById(loginPacket.deviceOperatingSystem);
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
 
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
@@ -4381,6 +4385,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         RemoveEntityPacket pkRemove = new RemoveEntityPacket();
         pkRemove.eid = bossBarId;
         this.dataPacket(pkRemove);
+    }
+    
+    /**
+     * Get the player's operating system
+     * 
+     * @return The player's operating system
+     */
+    public OperatingSystem getOperatingSystem() {
+        return operatingSystem;
     }
     
     public int getWindowId(Inventory inventory) {

@@ -31,6 +31,7 @@ public class LoginPacket extends DataPacket {
     public String identityPublicKey;
     public String serverAddress;
     public String deviceModel;
+    public int deviceOperatingSystem;
     public HashMap<String, JsonElement> clientData = new HashMap<>();
     public Skin skin;
 
@@ -99,6 +100,7 @@ public class LoginPacket extends DataPacket {
         if (clientData.containsKey("SkinId")) skinId = clientData.get("SkinId").getAsString();
         if (clientData.containsKey("SkinData")) this.skin = new Skin(clientData.get("SkinData").getAsString(), skinId);
         if (clientData.containsKey("DeviceModel")) this.deviceModel = clientData.get("DeviceModel").getAsString();
+        if (clientData.containsKey("DeviceOS")) this.deviceOperatingSystem = clientData.get("DeviceOS").getAsInt();
     }
 
     private JsonObject decodeToken(String token) {

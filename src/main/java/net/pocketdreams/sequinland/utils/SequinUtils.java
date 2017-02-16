@@ -69,7 +69,7 @@ public class SequinUtils {
         try {
             return !Block.transparent[cs.getBlockId(x, y, z)];
         } catch (Exception e) {
-            return true; // Sometimes it will throw an exception when checking blocks outside the current ChunkSection, so let's just silently ignore it
+            return false; // Sometimes it will throw an exception when checking blocks outside the current ChunkSection, so let's just silently ignore it
         }
     }
 

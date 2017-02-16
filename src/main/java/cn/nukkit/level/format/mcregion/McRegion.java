@@ -14,6 +14,7 @@ import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.BinaryStream;
 import cn.nukkit.utils.ChunkException;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,9 +32,9 @@ import java.util.regex.Pattern;
  */
 public class McRegion extends BaseLevelProvider {
 
-    protected final Map<Long, RegionLoader> regions = new HashMap<>();
+    protected final Long2ObjectOpenHashMap<RegionLoader> regions = new Long2ObjectOpenHashMap<>();
 
-    protected Map<Long, Chunk> chunks = new HashMap<>();
+    protected Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<>();
 
     public McRegion(Level level, String path) throws IOException {
         super(level, path);
@@ -166,7 +167,7 @@ public class McRegion extends BaseLevelProvider {
         for (Chunk chunk : new ArrayList<>(this.chunks.values())) {
             this.unloadChunk(chunk.getX(), chunk.getZ(), false);
         }
-        this.chunks = new HashMap<>();
+        this.chunks = new Long2ObjectOpenHashMap<>();
     }
 
     @Override

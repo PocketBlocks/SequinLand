@@ -11,6 +11,7 @@ import cn.nukkit.level.generator.biome.Biome;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.ListTag;
 import cn.nukkit.nbt.tag.NumberTag;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,11 +24,11 @@ import java.util.Map;
  * Nukkit Project
  */
 public abstract class BaseFullChunk implements FullChunk {
-    protected final Map<Long, Entity> entities = new HashMap<>();
+    protected final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
 
-    protected final Map<Long, BlockEntity> tiles = new HashMap<>();
+    protected final Long2ObjectOpenHashMap<BlockEntity> tiles = new Long2ObjectOpenHashMap<>();
 
-    protected final Map<Integer, BlockEntity> tileList = new HashMap<>();
+    protected final Long2ObjectOpenHashMap<BlockEntity> tileList = new Long2ObjectOpenHashMap<>();
 
     protected int[] biomeColors;
 

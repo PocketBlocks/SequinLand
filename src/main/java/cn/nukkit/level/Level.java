@@ -52,6 +52,8 @@ import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
@@ -89,19 +91,19 @@ public class Level implements ChunkManager, Metadatable {
     // Lower values use less memory
     public static final int MAX_BLOCK_CACHE = 512;
 
-    private final Map<Long, BlockEntity> blockEntities = new HashMap<>();
+    private final Long2ObjectOpenHashMap<BlockEntity> blockEntities = new Long2ObjectOpenHashMap<>();
 
-    private Map<Long, Map<Long, SetEntityMotionPacket>> motionToSend = new HashMap<>();
-    private Map<Long, Map<Long, MoveEntityPacket>> moveToSend = new HashMap<>();
-    private Map<Long, Map<Long, MovePlayerPacket>> playerMoveToSend = new HashMap<>();
+    private Long2ObjectOpenHashMap<Map<Long, SetEntityMotionPacket>> motionToSend = new Long2ObjectOpenHashMap<>();
+    private Long2ObjectOpenHashMap<Map<Long, MoveEntityPacket>> moveToSend = new Long2ObjectOpenHashMap<>();
+    private Long2ObjectOpenHashMap<Map<Long, MovePlayerPacket>> playerMoveToSend = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Player> players = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Player> players = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Entity> entities = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Entity> entities = new Long2ObjectOpenHashMap<>();
 
-    public final Map<Long, Entity> updateEntities = new HashMap<>();
+    public final Long2ObjectOpenHashMap<Entity> updateEntities = new Long2ObjectOpenHashMap<>();
 
-    public final Map<Long, BlockEntity> updateBlockEntities = new HashMap<>();
+    public final Long2ObjectOpenHashMap<BlockEntity> updateBlockEntities = new Long2ObjectOpenHashMap<>();
 
     // Use a weak map to avoid OOM
     private final Map<BlockVector3, Block> blockCache = new WeakHashMap<>();
@@ -117,15 +119,15 @@ public class Level implements ChunkManager, Metadatable {
 
     private LevelProvider provider;
 
-    private final Map<Integer, ChunkLoader> loaders = new HashMap<>();
+    private final Int2ObjectOpenHashMap<ChunkLoader> loaders = new Int2ObjectOpenHashMap<>();
 
     private final Map<Integer, Integer> loaderCounter = new HashMap<>();
 
-    private final Map<Long, Map<Integer, ChunkLoader>> chunkLoaders = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Map<Integer, ChunkLoader>> chunkLoaders = new Long2ObjectOpenHashMap<>();
 
-    private final Map<Long, Map<Integer, Player>> playerLoaders = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Map<Integer, Player>> playerLoaders = new Long2ObjectOpenHashMap<>();
 
-    private Map<Long, List<DataPacket>> chunkPackets = new HashMap<>();
+    private Long2ObjectOpenHashMap<List<DataPacket>> chunkPackets = new Long2ObjectOpenHashMap<>();
 
     private final Map<Long, Long> unloadQueue = new HashMap<>();
 
@@ -139,7 +141,7 @@ public class Level implements ChunkManager, Metadatable {
     private Vector3 mutableBlock;
 
     // Avoid OOM, gc'd references result in whole chunk being sent (possibly higher cpu)
-    private Map<Long, SoftReference<Map<Short, Object>>> changedBlocks = new HashMap<>();
+    Long2ObjectOpenHashMap<SoftReference<Map<Short, Object>>> changedBlocks = new Long2ObjectOpenHashMap<>();
     // Storing the vector is redundant
     private final Object changeBlocksPresent = new Object();
     // Storing extra blocks past 512 is redundant
@@ -153,7 +155,7 @@ public class Level implements ChunkManager, Metadatable {
     private PriorityQueue<PriorityObject> updateQueue;
     private final Map<BlockVector3, Integer> updateQueueIndex = new HashMap<>();
 
-    private final Map<Long, Map<Integer, Player>> chunkSendQueue = new HashMap<>();
+    private final Long2ObjectOpenHashMap<Map<Integer, Player>> chunkSendQueue = new Long2ObjectOpenHashMap<>();
     private final Map<Long, Boolean> chunkSendTasks = new HashMap<>();
 
     private final Map<Long, Boolean> chunkPopulationQueue = new HashMap<>();

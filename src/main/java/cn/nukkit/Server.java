@@ -61,6 +61,7 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
+import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.*;
 import java.nio.ByteOrder;
@@ -256,6 +257,9 @@ public class Server {
         
         this.logger.info("Loading " + TextFormat.GREEN + "sequinland.yml" + TextFormat.WHITE + "...");
         this.sequinLandConfig = new Config(this.dataPath + "sequinland.yml", Config.YAML);
+        
+        // Init
+        SequinUtils.init();
         
         this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {

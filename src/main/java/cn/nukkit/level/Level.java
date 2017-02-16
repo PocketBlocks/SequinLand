@@ -52,6 +52,7 @@ import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
+import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -1617,6 +1618,8 @@ public class Level implements ChunkManager, Metadatable {
                 currentMap.put(Level.localBlockHash(x, y, z), changeBlocksPresent);
             }
         }
+        // Resend the blocks if Anti-Xray is enabled
+        if (Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false)) SequinUtils.updateNearbyBlocks(this, x, y, z, Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2));
     }
 
     public void dropItem(Vector3 source, Item item) {
@@ -1825,6 +1828,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
+        if (Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false)) SequinUtils.updateNearbyBlocks(this, vector.getFloorX(), vector.getFloorY(), vector.getFloorZ(), Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2));
         return item;
     }
 

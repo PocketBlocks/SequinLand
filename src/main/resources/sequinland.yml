@@ -5,3 +5,18 @@
 # GitHub: https://github.com/PocketDreams/SequinLand
 # Wiki: https://github.com/PocketDreams/SequinLand/wiki
 # PocketDreams: http://pocketdreams.net/
+
+# Currently Anti-Xray only works in Anvil worlds
+anti-xray:
+    enabled: false
+    radius-check: 2
+    change-from:
+    - 1
+    change-to:
+    - 56
+    - 129
+    - 15
+    - 16
+    - 14
+    - 21
+    - 73

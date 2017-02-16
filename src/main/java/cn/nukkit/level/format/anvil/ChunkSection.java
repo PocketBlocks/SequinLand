@@ -1,6 +1,8 @@
 package cn.nukkit.level.format.anvil;
 
+import cn.nukkit.Server;
 import cn.nukkit.nbt.tag.CompoundTag;
+import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -260,8 +262,23 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
             for (int z = 0; z < 16; z++) {
                 int i = (x << 7) | (z << 3);
                 for (int y = 0; y < 16; y += 2) {
-                    blocks[(i << 1) | y] = (byte) this.getBlockId(x, y, z);
-                    blocks[(i << 1) | (y + 1)] = (byte) this.getBlockId(x, y + 1, z);
+                    int id = this.getBlockId(x, y, z);
+                    int id2 = this.getBlockId(x, y + 1, z);
+                    if (Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false)) { // If Anti-Xray is enabled...
+                        // If the block doesn't have any transparent blocks nearby...
+                        if (!SequinUtils.hasTransparentBlockAdjacent(this, x, y, z, Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2))) {
+                            if (SequinUtils.shouldReplace(id)) {
+                                // And if the ID is stone...
+                                id = SequinUtils.getRandomToId();
+                            }
+                            if (SequinUtils.shouldReplace(id2)) {
+                                // And if the ID is stone...
+                                id = SequinUtils.getRandomToId();
+                            }
+                        }
+                    }
+                    blocks[(i << 1) | y] = (byte) id;
+                    blocks[(i << 1) | (y + 1)] = (byte) id2;
                     int b1 = this.getBlockData(x, y, z);
                     int b2 = this.getBlockData(x, y + 1, z);
                     data[i | (y >> 1)] = (byte) ((b2 << 4) | b1);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.SplittableRandom;
 
 import cn.nukkit.Server;
+import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
@@ -63,9 +64,9 @@ public class SequinUtils {
      */
     public static boolean isSolidBlock(ChunkSection cs, int x, int y, int z) {
         try {
-            return cs.getBlockId(x, y, z) != 0; // Air
+            return !Block.transparent[cs.getBlockId(x, y, z)];
         } catch (Exception e) {
-            return true;
+            return true; // Sometimes it will throw an exception when checking blocks outside the current ChunkSection, so let's just silently ignore it
         }
     }
 

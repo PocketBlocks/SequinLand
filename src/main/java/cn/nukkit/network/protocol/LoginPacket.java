@@ -3,13 +3,16 @@ package cn.nukkit.network.protocol;
 import cn.nukkit.entity.data.Skin;
 import cn.nukkit.utils.Zlib;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 
@@ -28,7 +31,7 @@ public class LoginPacket extends DataPacket {
     public String identityPublicKey;
     public String serverAddress;
     public String deviceModel;
-
+    public HashMap<String, JsonElement> clientData = new HashMap<>();
     public Skin skin;
 
     @Override
@@ -88,11 +91,14 @@ public class LoginPacket extends DataPacket {
     private void decodeSkinData() {
         JsonObject skinToken = decodeToken(new String(this.get(this.getLInt())));
         String skinId = null;
-        if (skinToken.has("ClientRandomId")) this.clientId = skinToken.get("ClientRandomId").getAsLong();
-        if (skinToken.has("ServerAddress")) this.serverAddress = skinToken.get("ServerAddress").getAsString();
-        if (skinToken.has("SkinId")) skinId = skinToken.get("SkinId").getAsString();
-        if (skinToken.has("SkinData")) this.skin = new Skin(skinToken.get("SkinData").getAsString(), skinId);
-        if (skinToken.has("DeviceModel")) this.deviceModel = skinToken.get("DeviceModel").getAsString();
+        for (Entry<String, JsonElement> entry : skinToken.entrySet()) {
+            clientData.put(entry.getKey(), entry.getValue());
+        }
+        if (clientData.containsKey("ClientRandomId")) this.clientId = clientData.get("ClientRandomId").getAsLong();
+        if (clientData.containsKey("ServerAddress")) this.serverAddress = clientData.get("ServerAddress").getAsString();
+        if (clientData.containsKey("SkinId")) skinId = clientData.get("SkinId").getAsString();
+        if (clientData.containsKey("SkinData")) this.skin = new Skin(clientData.get("SkinData").getAsString(), skinId);
+        if (clientData.containsKey("DeviceModel")) this.deviceModel = clientData.get("DeviceModel").getAsString();
     }
 
     private JsonObject decodeToken(String token) {

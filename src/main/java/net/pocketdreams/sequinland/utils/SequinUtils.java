@@ -9,6 +9,7 @@ import cn.nukkit.block.Block;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
+import net.pocketdreams.sequinland.SequinLandConfig;
 
 public class SequinUtils {
     private static List<Integer> from = Arrays.asList(1);
@@ -25,6 +26,8 @@ public class SequinUtils {
     
     // TODO: Something more pretty
     public static void init() {
+        SequinLandConfig.antiXrayEnabled = Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false);
+        SequinLandConfig.antiXrayRadius = Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2);
         if (Server.getInstance().getSequinLandConfig().exists("anti-xray.change-from")) {
             from = Server.getInstance().getSequinLandConfig().getIntegerList("anti-xray.change-from");
         }

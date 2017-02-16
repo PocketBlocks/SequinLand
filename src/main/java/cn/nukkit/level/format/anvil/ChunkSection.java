@@ -2,6 +2,7 @@ package cn.nukkit.level.format.anvil;
 
 import cn.nukkit.Server;
 import cn.nukkit.nbt.tag.CompoundTag;
+import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.nio.ByteBuffer;
@@ -264,9 +265,9 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
                 for (int y = 0; y < 16; y += 2) {
                     int id = this.getBlockId(x, y, z);
                     int id2 = this.getBlockId(x, y + 1, z);
-                    if (Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false)) { // If Anti-Xray is enabled...
+                    if (SequinLandConfig.antiXrayEnabled) { // If Anti-Xray is enabled...
                         // If the block doesn't have any transparent blocks nearby...
-                        if (!SequinUtils.hasTransparentBlockAdjacent(this, x, y, z, Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2))) {
+                        if (!SequinUtils.hasTransparentBlockAdjacent(this, x, y, z, SequinLandConfig.antiXrayRadius)) {
                             if (SequinUtils.shouldReplace(id)) {
                                 // And if the ID is stone...
                                 id = SequinUtils.getRandomToId();

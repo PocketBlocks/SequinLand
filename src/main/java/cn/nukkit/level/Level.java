@@ -52,6 +52,7 @@ import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import co.aikar.timings.TimingsHistory;
+import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.File;
@@ -1619,7 +1620,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
         // Resend the blocks if Anti-Xray is enabled
-        if (Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false)) SequinUtils.updateNearbyBlocks(this, x, y, z, Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2));
+        if (SequinLandConfig.antiXrayEnabled) SequinUtils.updateNearbyBlocks(this, x, y, z, SequinLandConfig.antiXrayRadius);
     }
 
     public void dropItem(Vector3 source, Item item) {
@@ -1828,7 +1829,7 @@ public class Level implements ChunkManager, Metadatable {
             }
         }
 
-        if (Server.getInstance().getSequinLandConfig().getBoolean("anti-xray.enabled", false)) SequinUtils.updateNearbyBlocks(this, vector.getFloorX(), vector.getFloorY(), vector.getFloorZ(), Server.getInstance().getSequinLandConfig().getInt("anti-xray.radius-check", 2));
+        if (SequinLandConfig.antiXrayEnabled) SequinUtils.updateNearbyBlocks(this, vector.getFloorX(), vector.getFloorY(), vector.getFloorZ(), SequinLandConfig.antiXrayRadius);
         return item;
     }
 

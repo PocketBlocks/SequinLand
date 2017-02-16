@@ -165,7 +165,8 @@ public class Server {
 
     private Config properties;
     private Config config;
-
+    private Config sequinLandConfig; // SequinLand config file
+    
     private final Map<String, Player> players = new HashMap<>();
 
     private final Map<UUID, Player> playerList = new HashMap<>();
@@ -238,11 +239,24 @@ public class Server {
 
         }
 
+        if (!new File(this.dataPath + "sequinland.yml").exists()) {
+            InputStream sequinLandConf = this.getClass().getClassLoader().getResourceAsStream("sequinland.yml");
+
+            try {
+                Utils.writeFile(this.dataPath + "sequinland.yml", sequinLandConf);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
         this.console.start();
 
         this.logger.info("Loading " + TextFormat.GREEN + "nukkit.yml" + TextFormat.WHITE + "...");
         this.config = new Config(this.dataPath + "nukkit.yml", Config.YAML);
-
+        
+        this.logger.info("Loading " + TextFormat.GREEN + "sequinland.yml" + TextFormat.WHITE + "...");
+        this.sequinLandConfig = new Config(this.dataPath + "sequinland.yml", Config.YAML);
+        
         this.logger.info("Loading " + TextFormat.GREEN + "server properties" + TextFormat.WHITE + "...");
         this.properties = new Config(this.dataPath + "server.properties", Config.PROPERTIES, new ConfigSection() {
             {
@@ -1714,6 +1728,10 @@ public class Server {
         return this.config;
     }
 
+    public Config getSequinLandConfig() {
+        return this.sequinLandConfig;
+    }
+    
     public Object getConfig(String variable) {
         return this.getConfig(variable, null);
     }

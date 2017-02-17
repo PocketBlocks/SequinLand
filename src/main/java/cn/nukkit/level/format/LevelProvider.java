@@ -3,7 +3,6 @@ package cn.nukkit.level.format;
 import cn.nukkit.level.Level;
 import cn.nukkit.level.format.generic.BaseFullChunk;
 import cn.nukkit.math.Vector3;
-import cn.nukkit.scheduler.AsyncTask;
 
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public interface LevelProvider {
     byte ORDER_YZX = 0;
     byte ORDER_ZXY = 1;
 
-    AsyncTask requestChunkTask(int x, int z);
+    byte[] requestChunkTask(int x, int z);
 
     String getPath();
 

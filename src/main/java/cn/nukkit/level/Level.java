@@ -47,7 +47,6 @@ import cn.nukkit.network.protocol.*;
 import cn.nukkit.plugin.Plugin;
 import cn.nukkit.potion.Effect;
 import cn.nukkit.redstone.Redstone;
-import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.timings.LevelTimings;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
@@ -2378,10 +2377,8 @@ public class Level implements ChunkManager, Metadatable {
                     continue;
                 }
                 this.timings.syncChunkSendPrepareTimer.startTiming();
-                AsyncTask task = this.provider.requestChunkTask(x, z);
-                if (task != null) {
-                    this.server.getScheduler().scheduleAsyncTask(task);
-                }
+                byte[] stream = this.provider.requestChunkTask(x, z);
+                this.chunkRequestCallback(x, z, stream);
                 this.timings.syncChunkSendPrepareTimer.stopTiming();
             }
             this.timings.syncChunkSendTimer.stopTiming();

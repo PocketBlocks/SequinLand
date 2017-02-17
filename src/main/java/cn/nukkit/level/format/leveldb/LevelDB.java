@@ -15,7 +15,6 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.CompoundTag;
-import cn.nukkit.scheduler.AsyncTask;
 import cn.nukkit.utils.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 
@@ -156,7 +155,7 @@ public class LevelDB implements LevelProvider {
     }
 
     @Override
-    public AsyncTask requestChunkTask(int x, int z) {
+    public byte[] requestChunkTask(int x, int z) {
         FullChunk chunk = this.getChunk(x, z, false);
         if (chunk == null) {
             throw new ChunkException("Invalid Chunk sent");
@@ -211,9 +210,7 @@ public class LevelDB implements LevelProvider {
         }
         stream.put(tiles);
 
-        this.getLevel().chunkRequestCallback(x, z, stream.getBuffer());
-
-        return null;
+        return stream.getBuffer();
     }
 
     @Override

@@ -173,11 +173,14 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     }
 
     public void handleRakNetPacket(long identifier, RakNetPacket packet) {
+        System.out.println("Processing packet! Wow, so much fun!");
         if (this.players.containsKey(String.valueOf(identifier))) {
             DataPacket pk = null;
             try {
                 if (packet.array().length > 0) {
-                    if (packet.array()[0] == PING_DataPacket.ID) {
+                    System.out.println("More than > 0!!!");
+                    if (packet.getId() == PING_DataPacket.ID) {
+                        System.out.println("Oh it is a ping packet, who cares");
                         PING_DataPacket pingPacket = new PING_DataPacket();
                         pingPacket.buffer = packet.array();
                         pingPacket.decode();
@@ -186,13 +189,19 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                         return;
                     }
 
+                    System.out.println("Getting packets because why not!");
+                    
                     pk = this.getPacket(packet.array());
                     if (pk != null) {
+                        System.out.println("Will decode packet " + pk.getClass().getSimpleName());
                         pk.decode();
+                        System.out.println("Decoded!!!!!!");
                         this.players.get(String.valueOf(identifier)).handleDataPacket(pk);
+                        System.out.println("Handling!!!!!!");
                     }
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 this.server.getLogger().logException(e);
                 if (Nukkit.DEBUG > 1 && pk != null) {
                     MainLogger logger = this.server.getLogger();
@@ -315,7 +324,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
-            byte[] buffer = packet.getBuffer();
+            /* byte[] buffer = packet.getBuffer();
             String identifier = this.identifiers.get(player.rawHashCode());
             EncapsulatedPacket pk = null;
             if (!packet.isEncoded) {
@@ -369,8 +378,19 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                 RakNetClientSession session = raknet.getSession(player.rakNetGlobalId);
                 System.out.println("Sending packet!");
                 session.sendMessage(Reliability.RELIABLE_ORDERED, rnp);
+            } */
+            // return pk.identifierACK;
+            if (!packet.isEncoded) {
+                packet.encode();
             }
-            return pk.identifierACK;
+            RakNetClientSession session = raknet.getSession(player.rakNetGlobalId);
+            System.out.println("Null buffer?: " + (packet.getBuffer() == null ? "Yes" : "No" + " (size: " + packet.getBuffer().length + ")"));
+            System.out.println("Null session?: " + (session == null ? "Yes" : "No"));
+            RakNetPacket wrapper  = new RakNetPacket(0xFE); // RakNetPacket will automatically write the ID byte you give to it
+            wrapper.write(packet.getBuffer());
+            System.out.println("Sending packet " + packet.getClass().getSimpleName() + "...");
+            session.sendMessage(Reliability.RELIABLE_ORDERED, wrapper);
+            return 0;
         }
 
         return null;

@@ -61,6 +61,8 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
+import net.pocketdreams.sequinland.SequinLandConfig;
+import net.pocketdreams.sequinland.WatchdogThread;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.*;
@@ -180,7 +182,7 @@ public class Server {
 
     private Level defaultLevel = null;
 
-    private Thread currentThread;
+    public Thread currentThread;
     
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
@@ -807,6 +809,9 @@ public class Server {
             while (this.isRunning) {
                 try {
                     this.tick();
+                    if (SequinLandConfig.watchdogEnabled) {
+                        WatchdogThread.tick();
+                    }
                 } catch (RuntimeException e) {
                     this.getLogger().logException(e);
                 }

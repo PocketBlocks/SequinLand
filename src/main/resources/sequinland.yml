@@ -6,6 +6,9 @@
 # Wiki: https://github.com/PocketDreams/SequinLand/wiki
 # PocketDreams: http://pocketdreams.net/
 
+settings:
+    timeout-time: 60
+    enable-watchdog: true
 # Currently Anti-Xray only works in Anvil worlds
 anti-xray:
     enabled: false

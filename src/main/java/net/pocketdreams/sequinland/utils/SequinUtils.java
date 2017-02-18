@@ -10,6 +10,7 @@ import cn.nukkit.level.Level;
 import cn.nukkit.level.format.ChunkSection;
 import cn.nukkit.network.protocol.UpdateBlockPacket;
 import net.pocketdreams.sequinland.SequinLandConfig;
+import net.pocketdreams.sequinland.WatchdogThread;
 
 public class SequinUtils {
     private static List<Integer> from = Arrays.asList(1);
@@ -33,6 +34,11 @@ public class SequinUtils {
         }
         if (Server.getInstance().getSequinLandConfig().exists("anti-xray.change-to")) {
             to = Server.getInstance().getSequinLandConfig().getIntegerList("anti-xray.change-to");
+        }
+        SequinLandConfig.watchdogEnabled = Server.getInstance().getSequinLandConfig().getBoolean("settings.enable-watchdog", true);
+        SequinLandConfig.watchdogTimeout = Server.getInstance().getSequinLandConfig().getInt("settings.timeout-time", 60);
+        if (SequinLandConfig.watchdogEnabled) {
+            WatchdogThread.doStart( SequinLandConfig.watchdogTimeout, false );
         }
     }
     

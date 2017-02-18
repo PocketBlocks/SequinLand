@@ -104,10 +104,9 @@ public class LevelSoundEventPacket extends DataPacket {
     public float x;
     public float y;
     public float z;
-    public int extraData = -1;
+    public int volume = -1;
     public int pitch = 1;
     public boolean unknownBool;
-    public boolean unknownBool2;
     
     @Override
     public void decode() {
@@ -116,10 +115,9 @@ public class LevelSoundEventPacket extends DataPacket {
         this.x = v.x;
         this.y = v.y;
         this.z = v.z;
-        this.extraData = this.getVarInt();
+        this.volume = this.getVarInt();
         this.pitch = this.getVarInt();
         this.unknownBool = this.getBoolean();
-        this.unknownBool2 = this.getBoolean();
     }
 
     @Override
@@ -127,10 +125,9 @@ public class LevelSoundEventPacket extends DataPacket {
         this.reset();
         this.putByte(this.type);
         this.putVector3f(this.x, this.y, this.z);
-        this.putVarInt(this.extraData);
+        this.putUnsignedVarInt(this.volume);
         this.putVarInt(this.pitch);
         this.putBoolean(this.unknownBool);
-        this.putBoolean(this.unknownBool2);
     }
 
     @Override

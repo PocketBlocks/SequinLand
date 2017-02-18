@@ -35,7 +35,6 @@ import cn.nukkit.level.generator.Generator;
 import cn.nukkit.level.generator.task.*;
 import cn.nukkit.level.particle.DestroyBlockParticle;
 import cn.nukkit.level.particle.Particle;
-import cn.nukkit.level.sound.BlockPlaceSound;
 import cn.nukkit.level.sound.Sound;
 import cn.nukkit.math.*;
 import cn.nukkit.metadata.BlockMetadataStore;
@@ -54,6 +53,8 @@ import co.aikar.timings.TimingsHistory;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.pocketdreams.sequinland.SequinLandConfig;
+import net.pocketdreams.sequinland.level.sound.BlockPlaceSound;
+import net.pocketdreams.sequinland.level.sound.GenericSound;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.File;
@@ -486,6 +487,38 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
+    public void addSound(GenericSound sound) {
+        this.addSound(sound, (Player[]) null);
+    }
+    
+    public void addSound(GenericSound sound, Player player) {
+        this.addSound(sound, new Player[] { player });
+    }
+    
+    public void addSound(GenericSound sound, Collection<Player> players) {
+        this.addSound(sound, players.stream().toArray(Player[]::new));
+    }
+    
+    public void addSound(GenericSound sound, Player[] players) {
+        DataPacket[] packets = sound.encode();
+        
+        if (players == null) {
+            this.getPlayers().values().forEach((player) -> {
+                for (DataPacket packet : packets) {
+                    player.dataPacket(packet);
+                }
+            });
+        } else {
+            if (packets != null) {
+                if (packets.length == 1) {
+                    Server.broadcastPacket(players, packets[0]);
+                } else {
+                    this.server.batchPackets(players, packets, false);
+                }
+            }
+        }
+    }
+    
     @Deprecated
     public void addSound(Sound sound, Collection<Player> players) {
         this.addSound(sound, players.stream().toArray(Player[]::new));
@@ -2002,7 +2035,7 @@ public class Level implements ChunkManager, Metadatable {
         if (player != null) {
             BlockPlaceSound sound = new BlockPlaceSound(block.add(0.5, 0.5, 0.5));
             Map<Integer, Player> players = getChunkPlayers((int) block.x >> 4, (int) block.z >> 4);
-            addSound(sound, players.values());
+            addSound(sound, (Player[]) null);
 
             if (!player.isCreative()) {
                 item.setCount(item.getCount() - 1);

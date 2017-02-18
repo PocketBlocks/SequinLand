@@ -8,7 +8,7 @@ import cn.nukkit.network.protocol.DataPacket;
  * author: MagicDroidX
  * Nukkit Project
  */
-
+@Deprecated
 public class NoteBoxSound extends GenericSound {
 
     private final int instrument;

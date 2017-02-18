@@ -6,6 +6,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 /**
  * Created by Pub4Game on 28.06.2016.
  */
+@Deprecated
 public class ExperienceOrbSound extends GenericSound {
     public ExperienceOrbSound(Vector3 pos) {
         this(pos, 0);

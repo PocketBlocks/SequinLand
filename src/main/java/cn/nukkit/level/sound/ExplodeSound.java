@@ -3,6 +3,7 @@ package cn.nukkit.level.sound;
 import cn.nukkit.math.Vector3;
 import cn.nukkit.network.protocol.LevelEventPacket;
 
+@Deprecated
 public class ExplodeSound extends GenericSound {
 
     public ExplodeSound(Vector3 pos) {

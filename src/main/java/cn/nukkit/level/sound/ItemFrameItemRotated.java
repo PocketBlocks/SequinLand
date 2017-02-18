@@ -6,6 +6,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 /**
  * Created by Pub4Game on 03.07.2016.
  */
+@Deprecated
 public class ItemFrameItemRotated extends GenericSound {
     public ItemFrameItemRotated(Vector3 pos) {
         this(pos, 0);

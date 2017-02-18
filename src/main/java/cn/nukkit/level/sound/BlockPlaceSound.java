@@ -6,6 +6,7 @@ import cn.nukkit.network.protocol.LevelEventPacket;
 /**
  * Created by CreeperFace on 13. 11. 2016.
  */
+@Deprecated
 public class BlockPlaceSound extends GenericSound {
 
     public BlockPlaceSound(Vector3 pos) {

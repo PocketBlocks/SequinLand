@@ -28,6 +28,7 @@ public class NoteblockEvent extends GenericEvent {
         super(pos);
         this.instrument = instrument;
         this.pitch = pitch;
+        this.evid = 16420; // TODO: Store this in a static var
     }
 
     @Override

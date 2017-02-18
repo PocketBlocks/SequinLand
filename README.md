@@ -42,8 +42,9 @@ SequinLand will still track upstream Nukkit and merge changes as needed.
 Servers using SequinLand
 --------------------
 
-None yet!
+![http://pocketdreams.net/assets/img/pocketdreams_banner.png](http://pocketdreams.net/assets/img/pocketdreams_banner.png)
 
+(You use SequinLand and you want to show your server here? Then send a tweet to @mrpowergamerbr on Twitter or send a message to MrPowerGamerBR#4185 on Discord)
 Get SequinLand
 --------------------
 

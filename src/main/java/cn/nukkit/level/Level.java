@@ -455,14 +455,17 @@ public class Level implements ChunkManager, Metadatable {
         this.server.getLevels().remove(this.levelId);
     }
 
+    @Deprecated
     public void addSound(Sound sound) {
         this.addSound(sound, (Player[]) null);
     }
 
+    @Deprecated
     public void addSound(Sound sound, Player player) {
         this.addSound(sound, new Player[]{player});
     }
 
+    @Deprecated
     public void addSound(Sound sound, Player[] players) {
         DataPacket[] packets = sound.encode();
 
@@ -483,6 +486,7 @@ public class Level implements ChunkManager, Metadatable {
         }
     }
 
+    @Deprecated
     public void addSound(Sound sound, Collection<Player> players) {
         this.addSound(sound, players.stream().toArray(Player[]::new));
     }

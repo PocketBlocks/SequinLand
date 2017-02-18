@@ -53,6 +53,7 @@ import co.aikar.timings.TimingsHistory;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.pocketdreams.sequinland.SequinLandConfig;
+import net.pocketdreams.sequinland.level.event.GenericEvent;
 import net.pocketdreams.sequinland.level.sound.BlockPlaceSound;
 import net.pocketdreams.sequinland.level.sound.GenericSound;
 import net.pocketdreams.sequinland.utils.SequinUtils;
@@ -500,6 +501,38 @@ public class Level implements ChunkManager, Metadatable {
     }
     
     public void addSound(GenericSound sound, Player[] players) {
+        DataPacket[] packets = sound.encode();
+        
+        if (players == null) {
+            this.getPlayers().values().forEach((player) -> {
+                for (DataPacket packet : packets) {
+                    player.dataPacket(packet);
+                }
+            });
+        } else {
+            if (packets != null) {
+                if (packets.length == 1) {
+                    Server.broadcastPacket(players, packets[0]);
+                } else {
+                    this.server.batchPackets(players, packets, false);
+                }
+            }
+        }
+    }
+    
+    public void addEvent(GenericEvent sound) {
+        this.addEvent(sound, (Player[]) null);
+    }
+    
+    public void addEvent(GenericEvent sound, Player player) {
+        this.addEvent(sound, new Player[] { player });
+    }
+    
+    public void addEvent(GenericEvent sound, Collection<Player> players) {
+        this.addEvent(sound, players.stream().toArray(Player[]::new));
+    }
+    
+    public void addEvent(GenericEvent sound, Player[] players) {
         DataPacket[] packets = sound.encode();
         
         if (players == null) {

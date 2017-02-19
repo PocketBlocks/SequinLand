@@ -17,6 +17,10 @@
             <id>aikar</id>
             <url>http://ci.emc.gs/nexus/content/groups/aikar/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -85,6 +89,11 @@
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-all</artifactId>
             <version>5.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.JRakNet</groupId>
+            <artifactId>JRakNet</artifactId>
+            <version>v2.5</version>
         </dependency>
     </dependencies>
 

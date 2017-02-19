@@ -52,6 +52,16 @@ public class NetworkManager extends RakNetServer {
     }
 
     @Override
+    public void onClientDisconnect(RakNetClientSession session, String reason) {
+        Player player = players.get(session.getGloballyUniqueId());
+        if (player == null) {
+            throw new RuntimeException("Trying to handle disconnect for a unknown player! Global ID: " + session.getGloballyUniqueId());
+        }
+        player.close(reason);
+        players.remove(session.getGloballyUniqueId());
+    }
+    
+    @Override
     public void handlePacket(RakNetClientSession session, RakNetPacket raknetPacket, int channel) {
         if (raknetPacket.getId() != 0xFE) {
             System.out.println("Invalid MCPE packet, not 0xFE");

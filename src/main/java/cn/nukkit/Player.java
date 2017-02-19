@@ -1989,13 +1989,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 break;
             }
 
-            // TODO: Fix!
-            /* if (!loginPacket.skin.isValid()) {
+            if (!loginPacket.skin.isValid()) {
                 this.close("", "disconnectionScreen.invalidSkin");
                 break;
             } else {
                 this.setSkin(loginPacket.getSkin());
-            } */
+            }
 
             this.deviceModel = loginPacket.deviceModel;
 

@@ -481,7 +481,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void setEnableClientCommand(boolean enable) {
         this.enableClientCommand = enable;
-        SetCommandsEnabledPacket pk = new SetCommandsEnabledPacket();
+        net.pocketdreams.sequinland.network.protocol.SetCommandsEnabledPacket pk = new net.pocketdreams.sequinland.network.protocol.SetCommandsEnabledPacket();
         pk.enabled = enable;
         this.dataPacket(pk);
         if (enable) this.sendCommandData();

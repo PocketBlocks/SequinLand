@@ -40,6 +40,7 @@ public class SequinUtils {
         if (SequinLandConfig.watchdogEnabled) {
             WatchdogThread.doStart( SequinLandConfig.watchdogTimeout, false );
         }
+        SequinLandConfig.loginTimeout = Server.getInstance().getSequinLandConfig().getInt("settings.login-timeout", 10);
     }
     
     /**

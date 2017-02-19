@@ -8,4 +8,5 @@ public class SequinLandConfig {
     public static boolean antiXrayEnabled = false;
     public static int watchdogTimeout = 60;
     public static boolean watchdogEnabled = true;
+    public static int loginTimeout = 10;
 }

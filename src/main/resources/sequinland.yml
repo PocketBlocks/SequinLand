@@ -9,6 +9,7 @@
 settings:
     timeout-time: 60
     enable-watchdog: true
+    login-timeout: 10
 # Currently Anti-Xray only works in Anvil worlds
 anti-xray:
     enabled: false

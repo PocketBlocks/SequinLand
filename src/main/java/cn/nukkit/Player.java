@@ -488,7 +488,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void sendCommandData() {
-        AvailableCommandsPacket pk = new AvailableCommandsPacket();
+        net.pocketdreams.sequinland.network.protocol.AvailableCommandsPacket pk = new net.pocketdreams.sequinland.network.protocol.AvailableCommandsPacket();
         Map<String, CommandDataVersions> data = new HashMap<>();
         int count = 0;
         for (Command command : this.server.getCommandMap().getCommands().values()) {
@@ -502,8 +502,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         if (count > 0) {
             //TODO: structure checking
             pk.commands = new Gson().toJson(data);
-            int identifier = this.dataPacket(pk, true); // We *need* ACK so we can be sure that the client received the packet or not
-            Thread t = new Thread() {
+            this.dataPacket(pk);
+            // int identifier = this.dataPacket(pk, true); // We *need* ACK so we can be sure that the client received the packet or not
+            // TODO: Fix this!
+            /* Thread t = new Thread() {
                 public void run() {
                     // We are going to wait 3 seconds, if after 3 seconds we didn't receive a reply from the client, resend the packet.
                     try {
@@ -516,7 +518,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                     } catch (InterruptedException e) {}
                 }
             };
-            t.start();
+            t.start(); */
         }
     }
 
@@ -919,7 +921,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     @Deprecated
     public int dataPacket(DataPacket packet, boolean needACK) {
         // TODO: Fix this!
-        System.out.println("You should not use dataPacket!");
+        System.out.println("You should not use dataPacket! " + packet.getClass().getSimpleName());
         return -1;
         /* if (!this.connected) {
             return -1;

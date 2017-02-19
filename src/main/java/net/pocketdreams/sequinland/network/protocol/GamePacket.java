@@ -196,6 +196,19 @@ public class GamePacket extends RakNetPacket {
         return this;
     }
 
+    public GamePacket writeVector3f(double x, double y, double z) {
+        this.writeFloat(x);
+        this.writeFloat(y);
+        this.writeFloat(z);
+        return this;
+    }
+    
+    public void writeBlockCoords(int x, int y, int z) {
+        this.writeSignedVarInt(x);
+        this.writeUnsignedVarInt(y);
+        this.writeSignedVarInt(z);
+    }
+    
     /**
      * Writes a vector of 3 integers
      * 

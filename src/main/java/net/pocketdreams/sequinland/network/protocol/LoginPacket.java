@@ -3,6 +3,7 @@ package net.pocketdreams.sequinland.network.protocol;
 import java.util.UUID;
 
 import cn.nukkit.network.protocol.ProtocolInfo;
+import cn.nukkit.utils.Zlib;
 import net.marfgamer.jraknet.Packet;
 
 public class LoginPacket extends GamePacket {
@@ -27,9 +28,16 @@ public class LoginPacket extends GamePacket {
     public void decode() {
         this.protocolVersion = this.readUInt();
         this.gameEdition = this.readUByte();
-        this.payload = this.readByteArray();
+        
+        byte[] str;
+        try {
+            str = Zlib.inflate(this.read((int) this.readUnsignedVarInt()));
+        } catch (Exception e) {
+            return;
+        }
         
         System.out.println("Protocol Version: " + protocolVersion);
+        System.out.println("Payload: " + str);
     }
     
     @Override

@@ -551,7 +551,9 @@ public class Server {
     }
 
     public static void broadcastPacket(Player[] players, DataPacket packet) {
+        System.out.println("Doing random things...");
         packet.encode();
+        System.out.println("Encoded!");
         packet.isEncoded = true;
         // TODO: Fix this!
         /* if (Network.BATCH_THRESHOLD >= 0 && packet.getBuffer().length >= Network.BATCH_THRESHOLD) {
@@ -560,12 +562,14 @@ public class Server {
         } */
 
         for (Player player : players) {
+            System.out.println("Sending to " + player.getName());
             player.dataPacket(packet);
         }
 
         if (packet.encapsulatedPacket != null) {
             packet.encapsulatedPacket = null;
         }
+        System.out.println("Wow!");
     }
 
     public void batchPackets(Player[] players, DataPacket[] packets) {
@@ -849,8 +853,11 @@ public class Server {
     }
 
     public void addOnlinePlayer(Player player) {
+        System.out.println("Adding player to list...");
         this.playerList.put(player.getUniqueId(), player);
-        this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin());
+        System.out.println("Updating player list data...");
+        // TODO: Fix!
+        // this.updatePlayerListData(player.getUniqueId(), player.getId(), player.getDisplayName(), player.getSkin());
     }
 
     public void removeOnlinePlayer(Player player) {
@@ -870,9 +877,11 @@ public class Server {
     }
 
     public void updatePlayerListData(UUID uuid, long entityId, String name, Skin skin, Player[] players) {
+        System.out.println("updating...");
         PlayerListPacket pk = new PlayerListPacket();
         pk.type = PlayerListPacket.TYPE_ADD;
         pk.entries = new PlayerListPacket.Entry[]{new PlayerListPacket.Entry(uuid, entityId, name, skin)};
+        System.out.println("broadcast the packet!");
         Server.broadcastPacket(players, pk);
     }
 

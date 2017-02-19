@@ -788,8 +788,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         respawnPacket.z = (float) pos.z;
         this.dataPacket(respawnPacket);
 
-        PlayStatusPacket playStatusPacket = new PlayStatusPacket();
-        playStatusPacket.status = PlayStatusPacket.PLAYER_SPAWN;
+        net.pocketdreams.sequinland.network.protocol.PlayStatusPacket playStatusPacket = new net.pocketdreams.sequinland.network.protocol.PlayStatusPacket();
+        playStatusPacket.status = net.pocketdreams.sequinland.network.protocol.PlayStatusPacket.SPAWNED;
         this.dataPacket(playStatusPacket);
 
         PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this,
@@ -911,6 +911,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * -1 is false
      * other is identifer
      */
+    @Deprecated
     public boolean dataPacket(DataPacket packet) {
         return this.dataPacket(packet, false) != -1;
     }
@@ -948,12 +949,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
      * -1 is false
      * other is identifer
      */
+    @Deprecated
     public boolean directDataPacket(DataPacket packet) {
         return this.directDataPacket(packet, false) != -1;
     }
 
+    @Deprecated
     public int directDataPacket(DataPacket packet, boolean needACK) {
         // TODO: Fix this!
+        System.out.println("using direct!!!");
         return -1;
         /* if (!this.connected) {
             return -1;
@@ -1689,7 +1693,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public void authenticateCallback(boolean valid) {
         //TODO add more stuff after authentication is available
-
+        System.out.println("Authenticate callback");
         if (!valid) {
             this.close("", "disconnectionScreen.invalidSession");
             return;
@@ -1699,6 +1703,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     protected void processLogin() {
+        System.out.println("Processing login");
         if (!this.server.isWhitelisted((this.getName()).toLowerCase())) {
             this.kick(PlayerKickEvent.Reason.NOT_WHITELISTED, "Server is white-listed");
 
@@ -1710,14 +1715,15 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
             this.kick(PlayerKickEvent.Reason.IP_BANNED, "You are banned");
             return;
         }
-
+        System.out.println("#1");
         if (this.hasPermission(Server.BROADCAST_CHANNEL_USERS)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_USERS, this);
         }
+        System.out.println("#2");
         if (this.hasPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE)) {
             this.server.getPluginManager().subscribeToPermission(Server.BROADCAST_CHANNEL_ADMINISTRATIVE, this);
         }
-
+        System.out.println("#3");
         for (Player p : new ArrayList<>(this.server.getOnlinePlayers().values())) {
             if (p != this && p.getName() != null && p.getName().equalsIgnoreCase(this.getName())) {
                 if (!p.kick(PlayerKickEvent.Reason.NEW_CONNECTION, "logged in from another location")) {
@@ -1731,14 +1737,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
             }
         }
-
+        System.out.println("#4");
         CompoundTag nbt = this.server.getOfflinePlayerData(this.username);
         if (nbt == null) {
             this.close(this.getLeaveMessage(), "Invalid data");
 
             return;
         }
-
+        System.out.println("#5");
         this.playedBefore = (nbt.getLong("lastPlayed") - nbt.getLong("firstPlayed")) > 1;
 
         boolean alive = true;
@@ -1808,17 +1814,21 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         float foodSaturationLevel = this.namedTag.getFloat("foodSaturationLevel");
         this.foodData = new PlayerFood(this, foodLevel, foodSaturationLevel);
 
+        System.out.println("#6");
         PlayerLoginEvent ev;
         this.server.getPluginManager().callEvent(ev = new PlayerLoginEvent(this, "Plugin reason"));
         if (ev.isCancelled()) {
             this.close(this.getLeaveMessage(), ev.getKickMessage());
-
+            System.out.println("Event is cancelled!");
             return;
         }
 
+        System.out.println("Test1");
         this.server.addOnlinePlayer(this);
+        System.out.println("Test2");
         this.loggedIn = true;
 
+        System.out.println("#7");
         if (this.isCreative()) {
             this.inventory.setHeldItemSlot(0);
         } else {
@@ -1826,12 +1836,12 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         if (this.isSpectator()) this.keepMovement = true;
-
-        PlayStatusPacket statusPacket = new PlayStatusPacket();
+        System.out.println("#8");
+        net.pocketdreams.sequinland.network.protocol.PlayStatusPacket statusPacket = new net.pocketdreams.sequinland.network.protocol.PlayStatusPacket();
         statusPacket.status = PlayStatusPacket.LOGIN_SUCCESS;
         this.dataPacket(statusPacket);
 
-        this.dataPacket(new ResourcePacksInfoPacket());
+        this.dataPacket(new net.pocketdreams.sequinland.network.protocol.ResourcePacksInfoPacket());
 
         if (this.spawnPosition == null && this.namedTag.contains("SpawnLevel") && (level = this.server.getLevelByName(this.namedTag.getString("SpawnLevel"))) != null) {
             this.spawnPosition = new Position(this.namedTag.getInt("SpawnX"), this.namedTag.getInt("SpawnY"), this.namedTag.getInt("SpawnZ"), level);
@@ -1839,7 +1849,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         Position spawnPosition = this.getSpawn();
 
-        StartGamePacket startGamePacket = new StartGamePacket();
+        net.pocketdreams.sequinland.network.protocol.StartGamePacket startGamePacket = new net.pocketdreams.sequinland.network.protocol.StartGamePacket();
         startGamePacket.entityUniqueId = 0;
         startGamePacket.entityRuntimeId = 0;
         startGamePacket.x = (float) this.x;
@@ -1863,9 +1873,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         startGamePacket.generator = 1; //0 old, 1 infinite, 2 flat
         this.dataPacket(startGamePacket);
 
-        SetTimePacket setTimePacket = new SetTimePacket();
+        net.pocketdreams.sequinland.network.protocol.SetTimePacket setTimePacket = new net.pocketdreams.sequinland.network.protocol.SetTimePacket();
         setTimePacket.time = this.level.getTime();
-        setTimePacket.started = !this.level.stopTime;
+        setTimePacket.daylightCycle = !this.level.stopTime;
         this.dataPacket(setTimePacket);
 
         this.setMovementSpeed(DEFAULT_SPEED);
@@ -2009,6 +2019,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
     
     public void dataPacket(GamePacket packet) {
+        System.out.println("Sending " + packet.getClass().getSimpleName() + "...");
         packet.encode(); // Encoding...
         session.sendMessage(Reliability.RELIABLE_ORDERED, packet);
     }

@@ -38,10 +38,6 @@ import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.nbt.tag.DoubleTag;
 import cn.nukkit.nbt.tag.FloatTag;
 import cn.nukkit.nbt.tag.ListTag;
-import cn.nukkit.network.CompressBatchedTask;
-import cn.nukkit.network.Network;
-import cn.nukkit.network.RakNetInterface;
-import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.network.query.QueryHandler;
 import cn.nukkit.network.rcon.RCON;
@@ -136,7 +132,7 @@ public class Server {
 
     private LevelMetadataStore levelMetadata;
 
-    private Network network;
+    // private Network network;
 
     private boolean networkCompressionAsync = true;
     public int networkCompressionLevel = 7;
@@ -320,7 +316,8 @@ public class Server {
             threshold = -1;
         }
 
-        Network.BATCH_THRESHOLD = threshold;
+        // TODO: Fix this!
+        // Network.BATCH_THRESHOLD = threshold;
         this.networkCompressionLevel = (int) this.getConfig("network.compression-level", 7);
         this.networkCompressionAsync = (boolean) this.getConfig("network.async-compression", true);
 
@@ -364,8 +361,9 @@ public class Server {
         this.logger.info(this.getLanguage().translateString("nukkit.server.networkStart", new String[]{this.getIp().equals("") ? "*" : this.getIp(), String.valueOf(this.getPort())}));
         this.serverID = UUID.randomUUID();
 
-        this.network = new Network(this);
-        this.network.setName(this.getMotd());
+        // TODO: Fix this!
+        // this.network = new Network(this);
+        // this.network.setName(this.getMotd());
 
         this.logger.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
         this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
@@ -393,7 +391,7 @@ public class Server {
 
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
 
-        this.network.registerInterface(new RakNetInterface(this));
+        // this.network.registerInterface(new RakNetInterface(this));
 
         this.pluginManager.loadPlugins(this.pluginPath);
 
@@ -551,10 +549,11 @@ public class Server {
     public static void broadcastPacket(Player[] players, DataPacket packet) {
         packet.encode();
         packet.isEncoded = true;
-        if (Network.BATCH_THRESHOLD >= 0 && packet.getBuffer().length >= Network.BATCH_THRESHOLD) {
+        // TODO: Fix this!
+        /* if (Network.BATCH_THRESHOLD >= 0 && packet.getBuffer().length >= Network.BATCH_THRESHOLD) {
             Server.getInstance().batchPackets(players, new DataPacket[]{packet}, false);
             return;
-        }
+        } */
 
         for (Player player : players) {
             player.dataPacket(packet);
@@ -596,7 +595,8 @@ public class Server {
         }
 
         if (!forceSync && this.networkCompressionAsync) {
-            this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
+            // TODO: Fix this!
+            // this.getScheduler().scheduleAsyncTask(new CompressBatchedTask(data, targets, this.networkCompressionLevel));
         } else {
             try {
                 this.broadcastPacketsCallback(Zlib.deflate(data, this.networkCompressionLevel), targets);
@@ -693,7 +693,8 @@ public class Server {
         this.operators.reload();
 
         for (BanEntry entry : this.getIPBans().getEntires().values()) {
-            this.getNetwork().blockAddress(entry.getName(), -1);
+            // TODO: Fix this!
+            // this.getNetwork().blockAddress(entry.getName(), -1);
         }
 
         this.pluginManager.registerInterface(JavaPluginLoader.class);
@@ -755,10 +756,11 @@ public class Server {
             this.console.interrupt();
 
             this.getLogger().debug("Stopping network interfaces");
-            for (SourceInterface interfaz : this.network.getInterfaces()) {
+            // TODO: Fix this!
+            /* for (SourceInterface interfaz : this.network.getInterfaces()) {
                 interfaz.shutdown();
                 this.network.unregisterInterface(interfaz);
-            }
+            } */
 
             this.getLogger().debug("Disabling timings");
             Timings.stopServer();
@@ -776,7 +778,8 @@ public class Server {
         }
 
         for (BanEntry entry : this.getIPBans().getEntires().values()) {
-            this.network.blockAddress(entry.getName(), -1);
+            // TODO: Fix this!
+            // this.network.blockAddress(entry.getName(), -1);
         }
 
         //todo send usage setting
@@ -799,7 +802,8 @@ public class Server {
         } catch (Exception e) {
             this.logger.logException(e);
 
-            this.getNetwork().blockAddress(address, 600);
+            // TODO: Fix this!
+            // this.getNetwork().blockAddress(address, 600);
         }
     }
 
@@ -1008,7 +1012,8 @@ public class Server {
         ++this.tickCounter;
 
         Timings.connectionTimer.startTiming();
-        this.network.processInterfaces();
+        // TODO: Fix this!
+        // this.network.processInterfaces();
 
         if (this.rcon != null) {
             this.rcon.check();
@@ -1041,7 +1046,8 @@ public class Server {
                 }
             }
 
-            this.getNetwork().updateName();
+            // TODO: Fix this!
+            // this.getNetwork().updateName();
         }
 
         if (this.autoSave && ++this.autoSaveTicker >= this.autoSaveTicks) {
@@ -1108,15 +1114,17 @@ public class Server {
                 " | Online " + this.players.size() + "/" + this.getMaxPlayers() +
                 " | Memory " + usage;
         if (!Nukkit.shortTitle) {
-            title += " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2)
-                    + " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s";
+            // TODO: Fix this!
+            /* title += " | U " + NukkitMath.round((this.network.getUpload() / 1024 * 1000), 2)
+                    + " D " + NukkitMath.round((this.network.getDownload() / 1024 * 1000), 2) + " kB/s"; */
         }
         title += " | TPS " + this.getTicksPerSecond() +
                 " | Load " + this.getTickUsage() + "%" + (char) 0x07;
 
         System.out.print(title);
 
-        this.network.resetStatistics();
+        // TODO: Fix this!
+        // this.network.resetStatistics();
     }
 
     public QueryRegenerateEvent getQueryInformation() {
@@ -1728,9 +1736,10 @@ public class Server {
         return forceLanguage;
     }
 
-    public Network getNetwork() {
+    // TODO: Fix this!
+    /* public Network getNetwork() {
         return network;
-    }
+    } */
 
     //Revising later...
     public Config getConfig() {

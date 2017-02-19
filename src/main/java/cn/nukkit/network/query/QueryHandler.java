@@ -83,7 +83,8 @@ public class QueryHandler {
                         new byte[]{0x00}
                 );
 
-                this.server.getNetwork().sendPacket(address, port, reply);
+                // TODO: Fix this!
+                // this.server.getNetwork().sendPacket(address, port, reply);
                 break;
             case STATISTICS:
                 String token = String.valueOf(Binary.readInt(Binary.subBytes(payload, 0, 4)));
@@ -100,7 +101,8 @@ public class QueryHandler {
                         payload.length == 8 ? this.longData : this.shortData
                 );
 
-                this.server.getNetwork().sendPacket(address, port, reply);
+                // TODO: Fix this!
+                // this.server.getNetwork().sendPacket(address, port, reply);
                 break;
         }
     }

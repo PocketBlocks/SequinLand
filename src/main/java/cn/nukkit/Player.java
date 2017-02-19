@@ -53,7 +53,6 @@ import cn.nukkit.math.*;
 import cn.nukkit.metadata.MetadataValue;
 import cn.nukkit.nbt.NBTIO;
 import cn.nukkit.nbt.tag.*;
-import cn.nukkit.network.SourceInterface;
 import cn.nukkit.network.protocol.*;
 import cn.nukkit.permission.PermissibleBase;
 import cn.nukkit.permission.Permission;
@@ -104,8 +103,6 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     public static final float DEFAULT_SPEED = 0.1f;
     public static final float MAXIMUM_SPEED = 0.5f;
-
-    protected final SourceInterface interfaz;
 
     public boolean playedBefore;
     public boolean spawned = false;
@@ -524,9 +521,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.perm.getEffectivePermissions();
     }
 
-    public Player(SourceInterface interfaz, Long clientID, String ip, int port) {
+    public Player(/* SourceInterface interfaz, */Long clientID, String ip, int port) {
         super(null, new CompoundTag());
-        this.interfaz = interfaz;
+        // this.interfaz = interfaz;
         this.windows = new HashMap<>();
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
@@ -915,7 +912,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public int dataPacket(DataPacket packet, boolean needACK) {
-        if (!this.connected) {
+        // TODO: Fix this!
+        return -1;
+        /* if (!this.connected) {
             return -1;
         }
 
@@ -935,7 +934,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 return identifier;
             }
         }
-        return 0;
+        return 0; */
     }
 
     /**
@@ -948,7 +947,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public int directDataPacket(DataPacket packet, boolean needACK) {
-        if (!this.connected) {
+        // TODO: Fix this!
+        return -1;
+        /* if (!this.connected) {
             return -1;
         }
 
@@ -968,11 +969,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 return identifier;
             }
         }
-        return 0;
+        return 0; */
+        
     }
 
     public int getPing() {
-        return this.interfaz.getNetworkLatency(this);
+        return 0;
+        // TODO: Fix this!
+        // return this.interfaz.getNetworkLatency(this);
     }
 
     public boolean sleepOn(Vector3 pos) {
@@ -1912,7 +1916,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             if (packet.pid() == ProtocolInfo.BATCH_PACKET) {
                 timing.stopTiming();
-                this.server.getNetwork().processBatch((BatchPacket) packet, this);
+                // TODO: Fix this!
+                // this.server.getNetwork().processBatch((BatchPacket) packet, this);
                 return;
             }
 
@@ -3699,7 +3704,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             super.close();
 
-            this.interfaz.close(this, notify ? reason : "");
+            // TODO: Fix this!
+            // this.interfaz.close(this, notify ? reason : "");
 
             if (this.loggedIn) {
                 this.server.removeOnlinePlayer(this);

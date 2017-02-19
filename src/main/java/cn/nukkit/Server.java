@@ -59,6 +59,7 @@ import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
 import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.WatchdogThread;
+import net.pocketdreams.sequinland.network.NetworkManager;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.*;
@@ -179,6 +180,7 @@ public class Server {
     private Level defaultLevel = null;
 
     public Thread currentThread;
+    private NetworkManager network;
     
     public Server(MainLogger logger, final String filePath, String dataPath, String pluginPath) {
         currentThread = Thread.currentThread(); // Saves the current thread instance as a reference, used in Server#isPrimaryThread()
@@ -364,7 +366,9 @@ public class Server {
         // TODO: Fix this!
         // this.network = new Network(this);
         // this.network.setName(this.getMotd());
-
+        this.network = new NetworkManager(this);
+        network.startThreaded(); // yay threaded
+        
         this.logger.info(this.getLanguage().translateString("nukkit.server.info", this.getName(), TextFormat.YELLOW + this.getNukkitVersion() + TextFormat.WHITE, TextFormat.AQUA + this.getCodename() + TextFormat.WHITE, this.getApiVersion()));
         this.logger.info(this.getLanguage().translateString("nukkit.server.license", this.getName()));
 

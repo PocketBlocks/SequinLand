@@ -66,8 +66,11 @@ import cn.nukkit.utils.TextFormat;
 import cn.nukkit.utils.Zlib;
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
+import net.marfgamer.jraknet.protocol.Reliability;
+import net.marfgamer.jraknet.session.RakNetClientSession;
 import net.pocketdreams.sequinland.event.player.AsyncPlayerPreLoginEvent;
 import net.pocketdreams.sequinland.event.player.PlayerTransferEvent;
+import net.pocketdreams.sequinland.network.protocol.GamePacket;
 import net.pocketdreams.sequinland.utils.OperatingSystem;
 
 import com.google.gson.Gson;
@@ -206,6 +209,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     private String deviceModel;
 
     private OperatingSystem operatingSystem;
+    private RakNetClientSession session;
     
     public BlockEnderChest getViewingEnderChest() {
         return viewingEnderChest;
@@ -521,9 +525,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.perm.getEffectivePermissions();
     }
 
-    public Player(/* SourceInterface interfaz, */Long clientID, String ip, int port) {
+    public Player(RakNetClientSession session, Long clientID, String ip, int port) {
         super(null, new CompoundTag());
-        // this.interfaz = interfaz;
+        this.session = session;
         this.windows = new HashMap<>();
         this.perm = new PermissibleBase(this);
         this.server = Server.getInstance();
@@ -911,8 +915,10 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return this.dataPacket(packet, false) != -1;
     }
 
+    @Deprecated
     public int dataPacket(DataPacket packet, boolean needACK) {
         // TODO: Fix this!
+        System.out.println("You should not use dataPacket!");
         return -1;
         /* if (!this.connected) {
             return -1;
@@ -1675,8 +1681,8 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void tryAuthenticate() {
-        PlayStatusPacket pk = new PlayStatusPacket();
-        pk.status = PlayStatusPacket.LOGIN_SUCCESS;
+        net.pocketdreams.sequinland.network.protocol.PlayStatusPacket pk = new net.pocketdreams.sequinland.network.protocol.PlayStatusPacket();
+        pk.status = net.pocketdreams.sequinland.network.protocol.PlayStatusPacket.OK;
         this.dataPacket(pk);
         this.authenticateCallback(true);
     }
@@ -1901,7 +1907,117 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.server.onPlayerLogin(this);
     }
 
+    public void handleGamePacket(GamePacket packet) {
+        // The GamePacket is already decoded, so we don't need to decode it again
+        System.out.println("Handing packet " + id + ", " + packet.getClass().getSimpleName());
+        
+        switch (packet.pid()) {
+        case ProtocolInfo.LOGIN_PACKET:
+            if (this.loggedIn) {
+                break;
+            }
+
+            net.pocketdreams.sequinland.network.protocol.LoginPacket loginPacket = (net.pocketdreams.sequinland.network.protocol.LoginPacket) packet;
+
+            String message;
+            if (loginPacket.getProtocol() != ProtocolInfo.CURRENT_PROTOCOL) {
+                if (loginPacket.getProtocol() < ProtocolInfo.CURRENT_PROTOCOL) {
+                    message = "disconnectionScreen.outdatedClient";
+
+                    PlayStatusPacket pk = new PlayStatusPacket();
+                    pk.status = PlayStatusPacket.LOGIN_FAILED_CLIENT;
+                    this.directDataPacket(pk);
+                } else {
+                    message = "disconnectionScreen.outdatedServer";
+
+                    PlayStatusPacket pk = new PlayStatusPacket();
+                    pk.status = PlayStatusPacket.LOGIN_FAILED_SERVER;
+                    this.directDataPacket(pk);
+                }
+                this.close("", message, false);
+                break;
+            }
+
+            this.username = TextFormat.clean(loginPacket.username);
+            this.displayName = this.username;
+            this.iusername = this.username.toLowerCase();
+            this.operatingSystem = OperatingSystem.getById(loginPacket.deviceOperatingSystem);
+            this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
+
+            if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
+                break;
+            }
+
+            this.randomClientId = loginPacket.clientId;
+
+            this.uuid = loginPacket.clientUUID;
+            this.rawUUID = Binary.writeUUID(this.uuid);
+
+            boolean valid = true;
+            int len = loginPacket.username.length();
+            if (len > 16 || len < 3) {
+                valid = false;
+            }
+
+            for (int i = 0; i < len && valid; i++) {
+                char c = loginPacket.username.charAt(i);
+                if ((c >= 'a' && c <= 'z') ||
+                        (c >= 'A' && c <= 'Z') ||
+                        (c >= '0' && c <= '9') ||
+                        c == '_' || c == ' '
+                        ) {
+                    continue;
+                }
+
+                valid = false;
+                break;
+            }
+
+            if (!valid || Objects.equals(this.iusername, "rcon") || Objects.equals(this.iusername, "console")) {
+                this.close("", "disconnectionScreen.invalidName");
+
+                break;
+            }
+
+            // TODO: Fix!
+            /* if (!loginPacket.skin.isValid()) {
+                this.close("", "disconnectionScreen.invalidSkin");
+                break;
+            } else {
+                this.setSkin(loginPacket.getSkin());
+            } */
+
+            this.deviceModel = loginPacket.deviceModel;
+
+            PlayerPreLoginEvent playerPreLoginEvent;
+            this.server.getPluginManager().callEvent(playerPreLoginEvent = new PlayerPreLoginEvent(this, "Plugin reason"));
+            if (playerPreLoginEvent.isCancelled()) {
+                this.close("", playerPreLoginEvent.getKickMessage());
+
+                break;
+            }
+            AsyncPlayerPreLoginEvent asyncPlayerPreLoginEvent = new AsyncPlayerPreLoginEvent(this, "Plugin reason");
+            CompletableFuture.runAsync(() -> this.server.getPluginManager().callEvent(asyncPlayerPreLoginEvent)).thenRun(() -> { 
+                if (asyncPlayerPreLoginEvent.isCancelled()) {
+                    this.close("", asyncPlayerPreLoginEvent.getKickMessage());
+                    return;
+                }
+                this.onPlayerPreLogin(); 
+            });
+            break;
+        }
+    }
+    
+    public void dataPacket(GamePacket packet) {
+        packet.encode(); // Encoding...
+        session.sendMessage(Reliability.RELIABLE_ORDERED, packet);
+    }
+    
+    @Deprecated
     public void handleDataPacket(DataPacket packet) {
+        if (true) {
+            throw new RuntimeException("You can't use handleDataPacket!");
+        }
         if (!connected) {
             return;
         }

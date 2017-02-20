@@ -18,8 +18,8 @@
             <url>http://ci.emc.gs/nexus/content/groups/aikar/</url>
         </repository>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>maven-repo</id>
+            <url>https://raw.githubusercontent.com/JRakNet/MavenRepository/master</url>
         </repository>
     </repositories>
     <dependencies>
@@ -91,9 +91,9 @@
             <version>5.0.4</version>
         </dependency>
         <dependency>
-            <groupId>com.github.JRakNet</groupId>
-            <artifactId>JRakNet</artifactId>
-            <version>v2.5</version>
+            <groupId>net.marfgamer</groupId>
+            <artifactId>jraknet</artifactId>
+            <version>2.5.1</version>
         </dependency>
     </dependencies>
 

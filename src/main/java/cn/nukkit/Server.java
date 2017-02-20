@@ -60,6 +60,7 @@ import co.aikar.timings.Timings;
 import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.WatchdogThread;
 import net.pocketdreams.sequinland.network.NetworkManager;
+import net.pocketdreams.sequinland.network.protocol.GamePacket;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.*;
@@ -572,11 +573,11 @@ public class Server {
         System.out.println("Wow!");
     }
 
-    public void batchPackets(Player[] players, DataPacket[] packets) {
+    public void batchPackets(Player[] players, GamePacket[] packets) {
         this.batchPackets(players, packets, false);
     }
 
-    public void batchPackets(Player[] players, DataPacket[] packets, boolean forceSync) {
+    public void batchPackets(Player[] players, GamePacket[] packets, boolean forceSync) {
         if (players == null || packets == null || players.length == 0 || packets.length == 0) {
             return;
         }
@@ -584,11 +585,11 @@ public class Server {
         Timings.playerNetworkSendTimer.startTiming();
         byte[][] payload = new byte[packets.length * 2][];
         for (int i = 0; i < packets.length; i++) {
-            DataPacket p = packets[i];
-            if (!p.isEncoded) {
+            GamePacket p = packets[i];
+            /* if (!p.isEncoded) {
                 p.encode();
-            }
-            byte[] buf = p.getBuffer();
+            } */
+            byte[] buf = p.array();
             payload[i * 2] = Binary.writeUnsignedVarInt(buf.length);
             payload[i * 2 + 1] = buf;
         }

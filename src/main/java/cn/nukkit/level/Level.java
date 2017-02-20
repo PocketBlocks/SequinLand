@@ -56,6 +56,7 @@ import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.level.event.GenericEvent;
 import net.pocketdreams.sequinland.level.sound.BlockPlaceSound;
 import net.pocketdreams.sequinland.level.sound.GenericSound;
+import net.pocketdreams.sequinland.network.protocol.GamePacket;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.File;
@@ -110,7 +111,7 @@ public class Level implements ChunkManager, Metadatable {
     private final Map<BlockVector3, Block> blockCache = new WeakHashMap<>();
 
     // Use a weak map to avoid OOM
-    private final Map<Long, DataPacket> chunkCache = new WeakHashMap<>();
+    private final Map<Long, GamePacket> chunkCache = new WeakHashMap<>();
 
     private boolean cacheChunks = false;
 
@@ -482,7 +483,8 @@ public class Level implements ChunkManager, Metadatable {
                 if (packets.length == 1) {
                     Server.broadcastPacket(players, packets[0]);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    // TODO: Fix this!
+                    // this.server.batchPackets(players, packets, false);
                 }
             }
         }
@@ -514,7 +516,8 @@ public class Level implements ChunkManager, Metadatable {
                 if (packets.length == 1) {
                     Server.broadcastPacket(players, packets[0]);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    // TODO: Fix this!
+                    // this.server.batchPackets(players, packets, false);
                 }
             }
         }
@@ -546,7 +549,8 @@ public class Level implements ChunkManager, Metadatable {
                 if (packets.length == 1) {
                     Server.broadcastPacket(players, packets[0]);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    // TODO: Fix this!
+                    // this.server.batchPackets(players, packets, false);
                 }
             }
         }
@@ -579,7 +583,8 @@ public class Level implements ChunkManager, Metadatable {
                 if (packets.length == 1) {
                     Server.broadcastPacket(players, packets[0]);
                 } else {
-                    this.server.batchPackets(players, packets, false);
+                    // TODO: Fix this!
+                    // this.server.batchPackets(players, packets, false);
                 }
             }
         }
@@ -1062,7 +1067,8 @@ public class Level implements ChunkManager, Metadatable {
                 packets.add(packet);
             }
         }
-        this.server.batchPackets(target, packets.toArray(new DataPacket[packets.size()]));
+        // TODO: Fix this!
+        // this.server.batchPackets(target, packets.toArray(new DataPacket[packets.size()]));
     }
 
     public void clearCache() {

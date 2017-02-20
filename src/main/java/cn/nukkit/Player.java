@@ -183,7 +183,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
     private final Map<Integer, Boolean> needACK = new HashMap<>();
 
-    private Map<Integer, List<DataPacket>> batchedPackets = new TreeMap<>();
+    private Map<Integer, List<GamePacket>> batchedPackets = new TreeMap<>();
 
     private PermissibleBase perm = null;
 
@@ -670,7 +670,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
     }
 
-    public void sendChunk(int x, int z, DataPacket packet) {
+    public void sendChunk(int x, int z, GamePacket gamePacket) {
         if (!this.connected) {
             return;
         }
@@ -678,7 +678,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.usedChunks.put(Level.chunkHash(x, z), true);
         this.chunkLoadCount++;
 
-        this.dataPacket(packet);
+        this.dataPacket(gamePacket);
 
         if (this.spawned) {
             for (Entity entity : this.level.getChunkEntities(x, z).values()) {
@@ -697,7 +697,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         this.usedChunks.put(Level.chunkHash(x, z), true);
         this.chunkLoadCount++;
 
-        FullChunkDataPacket pk = new FullChunkDataPacket();
+        net.pocketdreams.sequinland.network.protocol.FullChunkDataPacket pk = new net.pocketdreams.sequinland.network.protocol.FullChunkDataPacket();
         pk.chunkX = x;
         pk.chunkZ = z;
         pk.data = payload;
@@ -886,8 +886,33 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         return true;
     }
 
-    public boolean batchDataPacket(DataPacket packet) {
+    public boolean batchDataPacket(GamePacket packet) {
         if (!this.connected) {
+            return false;
+        }
+
+        // TODO: Fix this!
+        // try /*( Timing timing = Timings.getSendDataPacketTiming(packet) )*/ {
+            /* DataPacketSendEvent event = new DataPacketSendEvent(this, packet);
+            this.server.getPluginManager().callEvent(event);
+            if (event.isCancelled()) {
+                timing.stopTiming();
+                return false;
+            } */
+
+            if (!this.batchedPackets.containsKey(1)) {
+                this.batchedPackets.put(1, new ArrayList<>());
+            }
+
+            this.batchedPackets.get(1).add(packet);
+        // }
+        return true;
+    }
+    
+    public boolean batchDataPacket(DataPacket packet) {
+            System.out.println("You should not use batchDataPacket");
+            return false;
+        /* if (!this.connected) {
             return false;
         }
 
@@ -905,7 +930,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
             this.batchedPackets.get(packet.getChannel()).add(packet.clone());
         }
-        return true;
+        return true; */
     }
 
     /**
@@ -1659,7 +1684,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
         if (!this.batchedPackets.isEmpty()) {
             for (int channel : this.batchedPackets.keySet()) {
-                this.server.batchPackets(new Player[]{this}, batchedPackets.get(channel).stream().toArray(DataPacket[]::new), false);
+                this.server.batchPackets(new Player[]{this}, batchedPackets.get(channel).stream().toArray(GamePacket[]::new), false);
             }
             this.batchedPackets = new TreeMap<>();
         }
@@ -2015,6 +2040,13 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                 }
                 this.onPlayerPreLogin(); 
             });
+            break;
+        case ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET:
+            net.pocketdreams.sequinland.network.protocol.RequestChunkRadiusPacket requestChunkRadiusPacket = (net.pocketdreams.sequinland.network.protocol.RequestChunkRadiusPacket) packet;
+            net.pocketdreams.sequinland.network.protocol.ChunkRadiusUpdatedPacket chunkRadiusUpdatePacket = new net.pocketdreams.sequinland.network.protocol.ChunkRadiusUpdatedPacket();
+            this.chunkRadius = Math.max(5, Math.min(requestChunkRadiusPacket.radius, this.viewDistance));
+            chunkRadiusUpdatePacket.radius = this.chunkRadius;
+            this.dataPacket(chunkRadiusUpdatePacket);
             break;
         }
     }
@@ -4628,16 +4660,16 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
 
-    public static BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
-        FullChunkDataPacket pk = new FullChunkDataPacket();
+    public static net.pocketdreams.sequinland.network.protocol.BatchPacket getChunkCacheFromData(int chunkX, int chunkZ, byte[] payload) {
+        net.pocketdreams.sequinland.network.protocol.FullChunkDataPacket pk = new net.pocketdreams.sequinland.network.protocol.FullChunkDataPacket();
         pk.chunkX = chunkX;
         pk.chunkZ = chunkZ;
         pk.data = payload;
         pk.encode();
 
-        BatchPacket batch = new BatchPacket();
+        net.pocketdreams.sequinland.network.protocol.BatchPacket batch = new net.pocketdreams.sequinland.network.protocol.BatchPacket();
         byte[][] batchPayload = new byte[2][];
-        byte[] buf = pk.getBuffer();
+        byte[] buf = pk.array();
         batchPayload[0] = Binary.writeUnsignedVarInt(buf.length);
         batchPayload[1] = buf;
         byte[] data = Binary.appendBytes(batchPayload);
@@ -4648,7 +4680,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
         }
 
         batch.encode();
-        batch.isEncoded = true;
+        // batch.isEncoded = true;
         return batch;
     }
 

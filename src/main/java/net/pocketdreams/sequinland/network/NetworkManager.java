@@ -14,8 +14,10 @@ import net.marfgamer.jraknet.identifier.MCPEIdentifier;
 import net.marfgamer.jraknet.server.RakNetServer;
 import net.marfgamer.jraknet.session.RakNetClientSession;
 import net.marfgamer.jraknet.util.map.IntMap;
+import net.pocketdreams.sequinland.network.protocol.BatchPacket;
 import net.pocketdreams.sequinland.network.protocol.GamePacket;
 import net.pocketdreams.sequinland.network.protocol.LoginPacket;
+import net.pocketdreams.sequinland.network.protocol.RequestChunkRadiusPacket;
 
 public class NetworkManager extends RakNetServer {
     private final Server server;
@@ -30,6 +32,8 @@ public class NetworkManager extends RakNetServer {
 
         this.packets = new IntMap<Class<? extends GamePacket>>();
         packets.put(ProtocolInfo.LOGIN_PACKET, LoginPacket.class);
+        packets.put(ProtocolInfo.REQUEST_CHUNK_RADIUS_PACKET, RequestChunkRadiusPacket.class);
+        packets.put(ProtocolInfo.BATCH_PACKET, BatchPacket.class);
     }
 
     @Override

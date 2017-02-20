@@ -7,19 +7,22 @@ import cn.nukkit.event.player.PlayerCreationEvent;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
-import cn.nukkit.raknet.RakNet;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
-import cn.nukkit.raknet.protocol.PacketReliability;
 import cn.nukkit.raknet.protocol.packet.PING_DataPacket;
-import cn.nukkit.raknet.server.RakNetServer;
-import cn.nukkit.raknet.server.ServerHandler;
 import cn.nukkit.raknet.server.ServerInstance;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.MainLogger;
-import cn.nukkit.utils.Utils;
+import net.marfgamer.jraknet.RakNetPacket;
+import net.marfgamer.jraknet.identifier.MCPEIdentifier;
+import net.marfgamer.jraknet.protocol.Reliability;
+import net.marfgamer.jraknet.server.RakNetServer;
+import net.marfgamer.jraknet.server.RakNetServerListener;
+import net.marfgamer.jraknet.session.RakNetClientSession;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -43,15 +46,34 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
 
-    private final ServerHandler handler;
-
     private int[] channelCounts = new int[256];
 
     public RakNetInterface(Server server) {
         this.server = server;
 
-        this.raknet = new RakNetServer(this.server.getLogger(), this.server.getPort(), this.server.getIp().equals("") ? "0.0.0.0" : this.server.getIp());
-        this.handler = new ServerHandler(this.raknet, this);
+        raknet = new RakNetServer(server.getPort(), server.getMaxPlayers(), new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, server.getOnlinePlayers().size(),
+                server.getMaxPlayers(), System.currentTimeMillis(), "New World", "Survival"));
+        raknet.setListener(new RakNetServerListener() {
+            // Client connected
+            @Override
+            public void onClientConnect(RakNetClientSession session) {
+                openSession(String.valueOf(session.getGloballyUniqueId()), session.getAddress().getHostString(), session.getInetPort(), session.getGloballyUniqueId());
+            }
+
+            // Client disconnected
+            @Override
+            public void onClientDisconnect(RakNetClientSession session, String reason) {
+            }
+
+            // Packet received
+            @Override
+            public void handlePacket(RakNetClientSession session, RakNetPacket packet, int channel) {
+                handleRakNetPacket(session.getGloballyUniqueId(), packet);
+            }
+        });
+
+        // Start server
+        raknet.startThreaded();
     }
 
     @Override
@@ -62,13 +84,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public boolean process() {
         boolean work = false;
-        if (this.handler.handlePacket()) {
-            work = true;
-            while (this.handler.handlePacket()) {
-
-            }
-        }
-
         return work;
     }
 
@@ -108,12 +123,13 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     @Override
     public void shutdown() {
-        this.handler.shutdown();
+        this.raknet.shutdown();
     }
 
     @Override
     public void emergencyShutdown() {
-        this.handler.emergencyShutdown();
+        // TODO: What is a "emergency shutdown"?
+        this.raknet.shutdown();
     }
 
     @Override
@@ -125,6 +141,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         try {
             Constructor constructor = clazz.getConstructor(SourceInterface.class, Long.class, String.class, int.class);
             Player player = (Player) constructor.newInstance(this, ev.getClientId(), ev.getAddress(), ev.getPort());
+            player.globalRakNetId = clientID;
             this.players.put(identifier, player);
             this.networkLatency.put(identifier, 0);
             this.identifiersACK.put(identifier, 0);
@@ -135,42 +152,50 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         }
     }
 
-    @Override
-    public void handleEncapsulated(String identifier, EncapsulatedPacket packet, int flags) {
-        if (this.players.containsKey(identifier)) {
+    public void handleRakNetPacket(long identifier, RakNetPacket packet) {
+        if (this.players.containsKey(String.valueOf(identifier))) {
             DataPacket pk = null;
             try {
-                if (packet.buffer.length > 0) {
-                    if (packet.buffer[0] == PING_DataPacket.ID) {
+                if (packet.array().length > 0) {
+                    if (packet.array()[0] == PING_DataPacket.ID) {
                         PING_DataPacket pingPacket = new PING_DataPacket();
-                        pingPacket.buffer = packet.buffer;
+                        pingPacket.buffer = packet.array();
                         pingPacket.decode();
 
-                        this.networkLatency.put(identifier, (int) pingPacket.pingID);
+                        this.networkLatency.put(String.valueOf(identifier), (int) pingPacket.pingID);
                         return;
                     }
 
-                    pk = this.getPacket(packet.buffer);
+                    pk = this.getPacket(packet.array());
                     if (pk != null) {
                         pk.decode();
-                        this.players.get(identifier).handleDataPacket(pk);
+                        this.players.get(String.valueOf(identifier)).handleDataPacket(pk);
                     }
                 }
             } catch (Exception e) {
                 this.server.getLogger().logException(e);
                 if (Nukkit.DEBUG > 1 && pk != null) {
                     MainLogger logger = this.server.getLogger();
-//                    if (logger != null) {
-                    logger.debug("Packet " + pk.getClass().getName() + " 0x" + Binary.bytesToHexString(packet.buffer));
+                    //                    if (logger != null) {
+                    logger.debug("Packet " + pk.getClass().getName() + " 0x" + Binary.bytesToHexString(packet.array()));
                     //logger.logException(e);
-//                    }
+                    //                    }
                 }
 
-                if (this.players.containsKey(identifier)) {
-                    this.handler.blockAddress(this.players.get(identifier).getAddress(), 5);
+                if (this.players.containsKey(String.valueOf(identifier))) {
+                    try {
+                        this.raknet.blockAddress(InetAddress.getByName(this.players.get(identifier).getAddress()), 5);
+                    } catch (UnknownHostException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         }
+    }
+    
+    @Override
+    public void handleEncapsulated(String identifier, EncapsulatedPacket packet, int flags) {
+        throw new RuntimeException();
     }
 
     @Override
@@ -180,7 +205,11 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     @Override
     public void blockAddress(String address, int timeout) {
-        this.handler.blockAddress(address, timeout);
+        try {
+            this.raknet.blockAddress(InetAddress.getByName(address), timeout);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -190,7 +219,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     @Override
     public void sendRawPacket(String address, int port, byte[] payload) {
-        this.handler.sendRaw(address, port, payload);
+        // TODO: Fix this! If this isn't fixed, query WON'T work!
     }
 
     @Override
@@ -205,16 +234,13 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public void setName(String name) {
         QueryRegenerateEvent info = this.server.getQueryInformation();
 
-        this.handler.sendOption("name",
-                "MCPE;" + Utils.rtrim(name.replace(";", "\\;"), '\\') + ";" +
-                        ProtocolInfo.CURRENT_PROTOCOL + ";" +
-                        ProtocolInfo.MINECRAFT_VERSION_NETWORK + ";" +
-                        info.getPlayerCount() + ";" +
-                        info.getMaxPlayerCount());
+        raknet.setIdentifier(new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, info.getPlayerCount(),
+                info.getMaxPlayerCount(), System.currentTimeMillis(), "New World", "Survival"));
     }
 
     public void setPortCheck(boolean value) {
-        this.handler.sendOption("portChecking", String.valueOf(value));
+        // TODO: What is this?
+        // this.handler.sendOption("portChecking", String.valueOf(value));
     }
 
     @Override
@@ -238,56 +264,16 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     @Override
     public Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
-            byte[] buffer = packet.getBuffer();
-            String identifier = this.identifiers.get(player.rawHashCode());
-            EncapsulatedPacket pk = null;
             if (!packet.isEncoded) {
                 packet.encode();
-                buffer = packet.getBuffer();
-            } else if (!needACK) {
-                if (packet.encapsulatedPacket == null) {
-                    packet.encapsulatedPacket = new CacheEncapsulatedPacket();
-                    packet.encapsulatedPacket.identifierACK = null;
-                    packet.encapsulatedPacket.buffer = Binary.appendBytes((byte) 0xfe, buffer);
-                    if (packet.getChannel() != 0) {
-                        packet.encapsulatedPacket.reliability = PacketReliability.RELIABLE_ORDERED;
-                        packet.encapsulatedPacket.orderChannel = packet.getChannel();
-                        packet.encapsulatedPacket.orderIndex = 0;
-                    } else {
-                        packet.encapsulatedPacket.reliability = 2;
-                    }
-                }
-                pk = packet.encapsulatedPacket;
             }
+            RakNetClientSession session = raknet.getSession(player.globalRakNetId);
+            RakNetPacket wrapper  = new RakNetPacket(0xFE); // RakNetPacket will automatically write the ID byte you give to it
+            wrapper.write(packet.getBuffer());
+            session.sendMessage(Reliability.RELIABLE_ORDERED, wrapper);
 
-
-            if (!immediate && !needACK && packet.pid() != ProtocolInfo.BATCH_PACKET && Network.BATCH_THRESHOLD >= 0 && buffer != null && buffer.length >= Network.BATCH_THRESHOLD) {
-                this.server.batchPackets(new Player[]{player}, new DataPacket[]{packet}, true);
-                return null;
-            }
-
-            if (pk == null) {
-                pk = new EncapsulatedPacket();
-                pk.buffer = Binary.appendBytes((byte) 0xfe, buffer);
-                if (packet.getChannel() != 0) {
-                    packet.reliability = PacketReliability.RELIABLE_ORDERED;
-                    packet.orderChannel = packet.getChannel();
-                    packet.orderIndex = 0;
-                } else {
-                    packet.reliability = 2;
-                }
-
-                if (needACK) {
-                    int iACK = this.identifiersACK.get(identifier);
-                    iACK++;
-                    pk.identifierACK = iACK;
-                    this.identifiersACK.put(identifier, iACK);
-                }
-            }
-
-            this.handler.sendEncapsulated(identifier, pk, (needACK ? RakNet.FLAG_NEED_ACK : 0) | (immediate ? RakNet.PRIORITY_IMMEDIATE : RakNet.PRIORITY_NORMAL));
-
-            return pk.identifierACK;
+            // TODO: Fix ACK
+            return 0;
         }
 
         return null;

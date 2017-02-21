@@ -243,7 +243,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                 );
         RakNetPacket pk = new RakNetPacket(0x8);
         pk.write(buffer);
-        raknet.sendRawMessage(pk, InetSocketAddress.createUnresolved(address, port)); // Sends the raw bytes from the packet to the specified address
+        // raknet.sendRawMessage(pk, InetSocketAddress.createUnresolved(address, port)); // Sends the raw bytes from the packet to the specified address
     }
 
     @Override

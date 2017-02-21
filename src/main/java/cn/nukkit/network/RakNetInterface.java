@@ -9,7 +9,6 @@ import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
 import cn.nukkit.raknet.protocol.packet.PING_DataPacket;
-import cn.nukkit.raknet.server.ServerInstance;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.MainLogger;
 import net.marfgamer.jraknet.RakNetPacket;
@@ -22,7 +21,6 @@ import net.marfgamer.jraknet.session.RakNetClientSession;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -32,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * author: MagicDroidX
  * Nukkit Project
  */
-public class RakNetInterface implements ServerInstance, AdvancedSourceInterface {
+public class RakNetInterface implements AdvancedSourceInterface {
 
     private final Server server;
 
@@ -93,7 +91,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         return work;
     }
 
-    @Override
     public void closeSession(String identifier, String reason) {
         if (this.players.containsKey(identifier)) {
             Player player = this.players.get(identifier);
@@ -140,7 +137,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         this.raknet.shutdown();
     }
 
-    @Override
     public void openSession(String identifier, String address, int port, long clientID) {
         PlayerCreationEvent ev = new PlayerCreationEvent(this, Player.class, Player.class, null, address, port);
         this.server.getPluginManager().callEvent(ev);
@@ -208,8 +204,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             }
         }
     }
-    
-    @Override
+
     public void handleEncapsulated(String identifier, EncapsulatedPacket packet, int flags) {
         throw new RuntimeException();
     }
@@ -228,7 +223,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         }
     }
 
-    @Override
     public void handleRaw(String address, int port, byte[] payload) {
         this.server.handlePacket(address, port, payload);
     }
@@ -246,7 +240,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         // raknet.sendRawMessage(pk, InetSocketAddress.createUnresolved(address, port)); // Sends the raw bytes from the packet to the specified address
     }
 
-    @Override
     public void notifyACK(String identifier, int identifierACK) {
         // TODO: Better ACK notification implementation!
         for (Player p : server.getOnlinePlayers().values()) {
@@ -267,7 +260,6 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         // this.handler.sendOption("portChecking", String.valueOf(value));
     }
 
-    @Override
     public void handleOption(String name, String value) {
         if ("bandwidth".equals(name)) {
             String[] v = value.split(";");

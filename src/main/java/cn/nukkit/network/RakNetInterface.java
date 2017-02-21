@@ -22,7 +22,9 @@ import net.marfgamer.jraknet.session.RakNetClientSession;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,7 +54,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         this.server = server;
 
         raknet = new RakNetServer(server.getPort(), server.getMaxPlayers(), new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, server.getOnlinePlayers().size(),
-                server.getMaxPlayers(), System.currentTimeMillis(), "New World", "Survival"));
+                server.getMaxPlayers(), server.getServerUniqueId().getMostSignificantBits() & Long.MAX_VALUE, "New World", "Survival"));
         raknet.setListener(new RakNetServerListener() {
             // Client connected
             @Override
@@ -63,6 +65,10 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
             // Client disconnected
             @Override
             public void onClientDisconnect(RakNetClientSession session, String reason) {
+                // We first check if the global ID exists (prevents NPE when shutting down the server)
+                if (players.containsKey(String.valueOf(session.getGloballyUniqueId()))) {
+                    close(players.get(String.valueOf(session.getGloballyUniqueId())), reason);
+                }
             }
 
             // Packet received
@@ -113,11 +119,13 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
     public void close(Player player, String reason) {
         if (this.identifiers.containsKey(player.rawHashCode())) {
             String id = this.identifiers.get(player.rawHashCode());
-            this.players.remove(id);
-            this.networkLatency.remove(id);
-            this.identifiersACK.remove(id);
+            // TODO: I don't know WHY they did this for no reason at all!
+            // Those things will be closed in #closeSession anyway
+            // this.players.remove(id);
+            // this.networkLatency.remove(id);
+            // this.identifiersACK.remove(id);
             this.closeSession(id, reason);
-            this.identifiers.remove(player.rawHashCode());
+            // this.identifiers.remove(player.rawHashCode());
         }
     }
 
@@ -169,7 +177,15 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
                     pk = this.getPacket(packet.array());
                     if (pk != null) {
                         pk.decode();
-                        this.players.get(String.valueOf(identifier)).handleDataPacket(pk);
+                        DataPacket finalPk = pk;
+                        // Synchronize the data processing to the main thread
+                        // *Maybe* we don't need to synchronize it, but as Nukkit isn't thread safe...
+                        // better safe than sorry
+                        Server.getInstance().getScheduler().scheduleTask(new Runnable() {
+                            public void run() {
+                                players.get(String.valueOf(identifier)).handleDataPacket(finalPk);
+                            }
+                        });
                     }
                 }
             } catch (Exception e) {
@@ -219,7 +235,15 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
 
     @Override
     public void sendRawPacket(String address, int port, byte[] payload) {
-        // TODO: Fix this! If this isn't fixed, query WON'T work!
+        byte[] buffer = Binary.appendBytes(
+                new byte[]{(byte) (address.length() & 0xff)},
+                address.getBytes(StandardCharsets.UTF_8),
+                Binary.writeShort(port),
+                payload
+                );
+        RakNetPacket pk = new RakNetPacket(0x8);
+        pk.write(buffer);
+        raknet.sendRawMessage(pk, InetSocketAddress.createUnresolved(address, port)); // Sends the raw bytes from the packet to the specified address
     }
 
     @Override
@@ -235,7 +259,7 @@ public class RakNetInterface implements ServerInstance, AdvancedSourceInterface 
         QueryRegenerateEvent info = this.server.getQueryInformation();
 
         raknet.setIdentifier(new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, info.getPlayerCount(),
-                info.getMaxPlayerCount(), System.currentTimeMillis(), "New World", "Survival"));
+                info.getMaxPlayerCount(), server.getServerUniqueId().getMostSignificantBits() & Long.MAX_VALUE, "New World", "Survival"));
     }
 
     public void setPortCheck(boolean value) {

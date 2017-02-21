@@ -1124,7 +1124,7 @@ public class Server {
     }
 
     public String getName() {
-        return "Nukkit";
+        return "SequinLand";
     }
 
     public boolean isRunning() {

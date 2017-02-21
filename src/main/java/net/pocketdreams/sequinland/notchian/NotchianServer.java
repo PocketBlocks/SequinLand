@@ -98,9 +98,6 @@ public class NotchianServer {
                 pk.username = username;
                 // And then we send it to Nukkit
                 player.handleDataPacket(pk);
-                
-                session.send(new ServerJoinGamePacket(0, false, GameMode.SURVIVAL, 0, Difficulty.PEACEFUL, 10, WorldType.DEFAULT, false));
-                session.send(new ServerPlayerPositionRotationPacket(0, 128, 0, 0, 0, 0));
             }
         });
 

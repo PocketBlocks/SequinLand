@@ -27,6 +27,8 @@
             <groupId>net.pocketdreams</groupId>
             <artifactId>mcprotocollib</artifactId>
             <version>1.11.2-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/mcprotocollib-1.11.2-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

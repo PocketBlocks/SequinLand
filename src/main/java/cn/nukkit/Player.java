@@ -2010,9 +2010,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void handleDataPacket(DataPacket packet) {
-        System.out.println("handling data packet...");
         if (!connected) {
-            System.out.println("not connected!");
             return;
         }
 

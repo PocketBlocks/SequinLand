@@ -33,21 +33,24 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RakNetInterface implements AdvancedSourceInterface {
 
-    private final Server server;
+    public final Server server;
 
     private Network network;
 
-    private final RakNetServer raknet;
+    public static RakNetServer raknet;
 
-    private final Map<String, Player> players = new ConcurrentHashMap<>();
+    public static Map<String, Player> players = new ConcurrentHashMap<>();
 
-    private final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
+    public static final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
 
-    private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
+    public static  Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
 
     private int[] channelCounts = new int[256];
 
+    public static RakNetInterface instance;
+    
     public RakNetInterface(Server server) {
+        this.instance = this; // Static magic!
         this.server = server;
 
         raknet = new RakNetServer(server.getPort(), server.getMaxPlayers(), new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, server.getOnlinePlayers().size(),

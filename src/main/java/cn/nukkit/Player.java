@@ -2010,7 +2010,9 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
     }
 
     public void handleDataPacket(DataPacket packet) {
+        System.out.println("handling data packet...");
         if (!connected) {
+            System.out.println("not connected!");
             return;
         }
 
@@ -2037,15 +2039,19 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
 
                     LoginPacket loginPacket = (LoginPacket) packet;
 
+                    System.out.println("#1");
+                    
                     String message;
                     if (loginPacket.getProtocol() != ProtocolInfo.CURRENT_PROTOCOL) {
                         if (loginPacket.getProtocol() < ProtocolInfo.CURRENT_PROTOCOL) {
+                            System.out.println("#2");
                             message = "disconnectionScreen.outdatedClient";
 
                             PlayStatusPacket pk = new PlayStatusPacket();
                             pk.status = PlayStatusPacket.LOGIN_FAILED_CLIENT;
                             this.directDataPacket(pk);
                         } else {
+                            System.out.println("#2");
                             message = "disconnectionScreen.outdatedServer";
 
                             PlayStatusPacket pk = new PlayStatusPacket();
@@ -2056,21 +2062,25 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    System.out.println("#3");
                     this.username = TextFormat.clean(loginPacket.username);
                     this.displayName = this.username;
                     this.iusername = this.username.toLowerCase();
                     this.operatingSystem = OperatingSystem.getById(loginPacket.deviceOperatingSystem);
                     this.setDataProperty(new StringEntityData(DATA_NAMETAG, this.username), false);
 
+                    System.out.println("#4");
                     if (this.server.getOnlinePlayers().size() >= this.server.getMaxPlayers() && this.kick(PlayerKickEvent.Reason.SERVER_FULL, "disconnectionScreen.serverFull", false)) {
                         break;
                     }
 
+                    System.out.println("#5");
                     this.randomClientId = loginPacket.clientId;
 
                     this.uuid = loginPacket.clientUUID;
                     this.rawUUID = Binary.writeUUID(this.uuid);
 
+                    System.out.println("#6");
                     boolean valid = true;
                     int len = loginPacket.username.length();
                     if (len > 16 || len < 3) {
@@ -2091,12 +2101,14 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         break;
                     }
 
+                    System.out.println("#7");
                     if (!valid || Objects.equals(this.iusername, "rcon") || Objects.equals(this.iusername, "console")) {
                         this.close("", "disconnectionScreen.invalidName");
 
                         break;
                     }
 
+                    System.out.println("#8");
                     if (!loginPacket.skin.isValid()) {
                         this.close("", "disconnectionScreen.invalidSkin");
                         break;
@@ -2104,6 +2116,7 @@ public class Player extends EntityHuman implements CommandSender, InventoryHolde
                         this.setSkin(loginPacket.getSkin());
                     }
 
+                    System.out.println("#9");
                     this.deviceModel = loginPacket.deviceModel;
 
                     PlayerPreLoginEvent playerPreLoginEvent;

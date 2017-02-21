@@ -16,7 +16,7 @@ public interface SourceInterface {
 
     Integer putPacket(Player player, DataPacket packet, boolean needACK, boolean immediate);
 
-    int getNetworkLatency(Player player);
+    long getNetworkLatency(Player player);
 
     void close(Player player);
 

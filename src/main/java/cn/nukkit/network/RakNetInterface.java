@@ -16,6 +16,7 @@ import net.marfgamer.jraknet.identifier.MCPEIdentifier;
 import net.marfgamer.jraknet.protocol.Reliability;
 import net.marfgamer.jraknet.server.RakNetServer;
 import net.marfgamer.jraknet.server.RakNetServerListener;
+import net.marfgamer.jraknet.server.ServerPing;
 import net.marfgamer.jraknet.session.RakNetClientSession;
 
 import java.lang.reflect.Constructor;
@@ -40,8 +41,6 @@ public class RakNetInterface implements AdvancedSourceInterface {
 
     private final Map<String, Player> players = new ConcurrentHashMap<>();
 
-    private final Map<String, Integer> networkLatency = new ConcurrentHashMap<>();
-
     private final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
 
     private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
@@ -54,6 +53,12 @@ public class RakNetInterface implements AdvancedSourceInterface {
         raknet = new RakNetServer(server.getPort(), server.getMaxPlayers(), new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, server.getOnlinePlayers().size(),
                 server.getMaxPlayers(), server.getServerUniqueId().getMostSignificantBits() & Long.MAX_VALUE, "New World", "Survival"));
         raknet.setListener(new RakNetServerListener() {
+            // Client ping
+            @Override
+            public void handlePing(ServerPing ping) {
+                
+            }
+            
             // Client connected
             @Override
             public void onClientConnect(RakNetClientSession session) {
@@ -96,15 +101,14 @@ public class RakNetInterface implements AdvancedSourceInterface {
             Player player = this.players.get(identifier);
             this.identifiers.remove(player.rawHashCode());
             this.players.remove(identifier);
-            this.networkLatency.remove(identifier);
             this.identifiersACK.remove(identifier);
             player.close(player.getLeaveMessage(), reason);
         }
     }
 
     @Override
-    public int getNetworkLatency(Player player) {
-        return this.networkLatency.get(this.identifiers.get(player.rawHashCode()));
+    public long getNetworkLatency(Player player) {
+        return this.raknet.getSession(player.globalRakNetId).getLatency();
     }
 
     @Override
@@ -147,7 +151,6 @@ public class RakNetInterface implements AdvancedSourceInterface {
             Player player = (Player) constructor.newInstance(this, ev.getClientId(), ev.getAddress(), ev.getPort());
             player.globalRakNetId = clientID;
             this.players.put(identifier, player);
-            this.networkLatency.put(identifier, 0);
             this.identifiersACK.put(identifier, 0);
             this.identifiers.put(player.rawHashCode(), identifier);
             this.server.addPlayer(identifier, player);
@@ -161,15 +164,6 @@ public class RakNetInterface implements AdvancedSourceInterface {
             DataPacket pk = null;
             try {
                 if (packet.array().length > 0) {
-                    if (packet.array()[0] == PING_DataPacket.ID) {
-                        PING_DataPacket pingPacket = new PING_DataPacket();
-                        pingPacket.buffer = packet.array();
-                        pingPacket.decode();
-
-                        this.networkLatency.put(String.valueOf(identifier), (int) pingPacket.pingID);
-                        return;
-                    }
-
                     pk = this.getPacket(packet.array());
                     if (pk != null) {
                         pk.decode();

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.spacehq.mc.protocol.data.game.chunk.Chunk;
 import org.spacehq.mc.protocol.data.game.chunk.Column;
+import org.spacehq.mc.protocol.data.game.entity.metadata.Position;
 import org.spacehq.mc.protocol.data.game.entity.player.GameMode;
 import org.spacehq.mc.protocol.data.game.setting.Difficulty;
 import org.spacehq.mc.protocol.data.game.world.WorldType;
@@ -12,8 +13,12 @@ import org.spacehq.mc.protocol.data.game.world.block.BlockState;
 import org.spacehq.mc.protocol.packet.ingame.client.ClientChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerChatPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.ServerJoinGamePacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerAbilitiesPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerChangeHeldItemPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.entity.player.ServerPlayerPositionRotationPacket;
 import org.spacehq.mc.protocol.packet.ingame.server.world.ServerChunkDataPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
+import org.spacehq.mc.protocol.packet.ingame.server.world.ServerUpdateTimePacket;
 import org.spacehq.opennbt.tag.builtin.CompoundTag;
 import org.spacehq.packetlib.Session;
 
@@ -35,7 +40,7 @@ import cn.nukkit.utils.Zlib;
 
 public class NotchianClient extends Player {
     Session session;
-    
+
     public NotchianClient(Session session, Long clientID, String ip, int port) {
         super(null, clientID, ip, port);
         this.session = session;
@@ -47,14 +52,14 @@ public class NotchianClient extends Player {
         super.handleDataPacket(packet);
         return;
     }
-    
+
     @Override
     public int dataPacket(DataPacket packet, boolean needACK) {
-        
+
         if (packet instanceof BatchPacket) {
             // Decode BatchPackets
             List<DataPacket> packets = decodeBatchPacket((BatchPacket) packet);
-            
+
             for (DataPacket pk : packets) {
                 this.dataPacket(pk); // Parse it again
             }
@@ -65,13 +70,57 @@ public class NotchianClient extends Player {
         if (packet instanceof StartGamePacket) {
             StartGamePacket pk = (StartGamePacket) packet;
             session.send(new ServerJoinGamePacket(0, false, GameMode.values()[pk.gamemode], pk.dimension, Difficulty.values()[pk.difficulty], 10, WorldType.DEFAULT, false));
+
+            session.send(new ServerSpawnPositionPacket(new Position(
+                    0,
+                    0,
+                    0)));
             
-            session.send(new ServerPlayerPositionRotationPacket(pk.x, pk.y, pk.z, 0, 0, 0));
+            // Send player abilities.
+            session.send(new ServerPlayerAbilitiesPacket(false, false,
+                    false, false, .1F, .1F));
+
+            session.send(new ServerPlayerChangeHeldItemPacket(
+                    0));
             
+            session.send(new ServerUpdateTimePacket(
+                    0,
+                    0));
+            
+            session.send(new ServerPlayerPositionRotationPacket(0, 100, 0, 0, 0, 0));
+
             // Request chunk data
             RequestChunkRadiusPacket pocketPk = new RequestChunkRadiusPacket();
             pocketPk.radius = 5;
             this.handleDataPacket(pocketPk);
+
+            Chunk chk = new Chunk(false);
+            { 
+                Column col = new Column(0, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
+                session.send(pkX);
+            }
+            { 
+                Column col = new Column(1, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
+                session.send(pkX);
+            }
+            { 
+                Column col = new Column(-1, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
+                session.send(pkX);
+            }
+            { 
+                Column col = new Column(0, 1, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
+                session.send(pkX);
+            }
+            { 
+                Column col = new Column(0, -1, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
+                session.send(pkX);
+            }
+            session.send(new ServerPlayerPositionRotationPacket(0, 100, 0, 0, 0, 0));
             return -1;
         }
         if (packet instanceof TextPacket) {
@@ -81,34 +130,24 @@ public class NotchianClient extends Player {
         }
         if (packet instanceof FullChunkDataPacket) {
             FullChunkDataPacket pocketPk = (FullChunkDataPacket) packet;
-            
-            Chunk chk = new Chunk(true);
-            for (int x = 0; 15 > x; x++) {
-                for (int y = 0; 15 > y; y++) {
-                    for (int z = 0; 15 > z; z++) {
-                        chk.getBlocks().set(x, y, z, new BlockState(1, 0)); // I love stone
-                    }
-                }
-            }
-            Column col = new Column(pocketPk.chunkX, pocketPk.chunkZ, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
-            ServerChunkDataPacket pk = new ServerChunkDataPacket(col);
-            session.send(pk);
+
+
             return -1;
         }
         return -1;
     }
-    
+
     @Override
     public int directDataPacket(DataPacket packet, boolean needACK) {
         System.out.println("Sending directly " + packet.getClass().getSimpleName());
         return -1;
     }
-    
+
     @Override
     public void close(TextContainer message, String reason, boolean notify) {
         System.out.println("Closing connection due to " + reason);
     }
-    
+
     public static List<DataPacket> decodeBatchPacket(BatchPacket packet) {
         byte[] data;
         try {

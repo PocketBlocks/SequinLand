@@ -53,12 +53,6 @@ public class RakNetInterface implements AdvancedSourceInterface {
         raknet = new RakNetServer(server.getPort(), server.getMaxPlayers(), new MCPEIdentifier(server.getMotd(), ProtocolInfo.CURRENT_PROTOCOL, ProtocolInfo.MINECRAFT_VERSION_NETWORK, server.getOnlinePlayers().size(),
                 server.getMaxPlayers(), server.getServerUniqueId().getMostSignificantBits() & Long.MAX_VALUE, "New World", "Survival"));
         raknet.setListener(new RakNetServerListener() {
-            // Client ping
-            @Override
-            public void handlePing(ServerPing ping) {
-                
-            }
-            
             // Client connected
             @Override
             public void onClientConnect(RakNetClientSession session) {

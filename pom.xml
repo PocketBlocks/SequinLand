@@ -75,11 +75,6 @@
             <version>0.8</version>
         </dependency>
         <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.7.Final</version>
-        </dependency>
-        <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>fastutil-lite</artifactId>
             <version>1.0</version>

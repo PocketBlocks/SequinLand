@@ -24,11 +24,15 @@
     </repositories>
     <dependencies>
         <dependency>
+            <!-- This dependency doesn't seem to be available in public maven 
+                repos. The jar file is included with the project under the lib dir. You need 
+                to manually install it in your local maven repo. The command below should 
+                work if mvn is on your path and you are in the lib dir: mvn install:install-file 
+                -Dfile=mcprotocollib-1.11.2-SNAPSHOT.jar -DgroupId=net.pocketdreams -DartifactId=mcprotocollib 
+                -Dversion=1.11.2-SNAPSHOT -Dpackaging=jar -->
             <groupId>net.pocketdreams</groupId>
             <artifactId>mcprotocollib</artifactId>
             <version>1.11.2-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/mcprotocollib-1.11.2-SNAPSHOT.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

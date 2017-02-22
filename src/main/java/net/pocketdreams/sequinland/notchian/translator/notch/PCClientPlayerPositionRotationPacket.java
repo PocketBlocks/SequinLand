@@ -15,7 +15,7 @@ public class PCClientPlayerPositionRotationPacket extends NotchPacketTranslator 
         ClientPlayerPositionRotationPacket pcPacket = (ClientPlayerPositionRotationPacket) packet;
         MovePlayerPacket pePacket = new MovePlayerPacket();
         pePacket.x = (float) pcPacket.getX();
-        pePacket.y = (float) (float)pcPacket.getY();
+        pePacket.y = (float) (pcPacket.getY() + 1.62F);
         pePacket.z = (float) pcPacket.getZ();
         pePacket.eid = 0;
         pePacket.headYaw = (float) pcPacket.getYaw();

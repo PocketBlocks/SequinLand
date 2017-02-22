@@ -64,6 +64,7 @@ import co.aikar.timings.Timings;
 import net.marfgamer.jraknet.RakNetPacket;
 import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.WatchdogThread;
+import net.pocketdreams.sequinland.notchian.NotchianServer;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.*;
@@ -789,6 +790,14 @@ public class Server {
 
         this.tickCounter = 0;
 
+        NotchianServer ns = new NotchianServer(this);
+        Thread t = new Thread() {
+            public void run() {
+                ns.start();
+            }
+        };
+        t.start();
+        
         this.logger.info(this.getLanguage().translateString("nukkit.server.defaultGameMode", getGamemodeString(this.getGamemode())));
 
         this.logger.info(this.getLanguage().translateString("nukkit.server.startFinished", String.valueOf((double) (System.currentTimeMillis() - Nukkit.START_TIME) / 1000)));

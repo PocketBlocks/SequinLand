@@ -39,11 +39,11 @@ public class RakNetInterface implements AdvancedSourceInterface {
 
     private final RakNetServer raknet;
 
-    private final Map<String, Player> players = new ConcurrentHashMap<>();
+    public final Map<String, Player> players = new ConcurrentHashMap<>();
 
-    private final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
+    public final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
 
-    private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
+    public final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
 
     public RakNetInterface(Server server) {
         this.server = server;

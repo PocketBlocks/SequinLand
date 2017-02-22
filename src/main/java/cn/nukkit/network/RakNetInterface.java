@@ -75,7 +75,17 @@ public class RakNetInterface implements AdvancedSourceInterface {
             // UT3 server query
             @Override
             public void handleNettyMessage(ByteBuf buf, InetSocketAddress address) {
-                // TODO: Implement server query
+                RakNetPacket pk = new RakNetPacket(buf);
+                
+                // #blameshoghi
+                // http://wiki.unrealadmin.org/UT3_query_protocol
+                // Header is 0xFE and 0xFD
+                if (pk.getId() == 0xFE) { 
+                    short b = pk.readUByte();
+                    if (b == 0xFD) {
+                        server.handleQueryRequest(pk, address);
+                    }
+                }
             }
         });
 
@@ -201,6 +211,10 @@ public class RakNetInterface implements AdvancedSourceInterface {
         throw new RuntimeException();
     }
 
+    public RakNetServer getJRakNetServer() {
+        return raknet;
+    }
+    
     @Override
     public void blockAddress(String address) {
         this.blockAddress(address, 300);
@@ -215,10 +229,6 @@ public class RakNetInterface implements AdvancedSourceInterface {
         }
     }
 
-    public void handleRaw(String address, int port, byte[] payload) {
-        this.server.handlePacket(address, port, payload);
-    }
-
     @Override
     public void sendRawPacket(String address, int port, byte[] payload) {
         byte[] buffer = Binary.appendBytes(
@@ -227,9 +237,9 @@ public class RakNetInterface implements AdvancedSourceInterface {
                 Binary.writeShort(port),
                 payload
                 );
-        RakNetPacket pk = new RakNetPacket(0x8);
+        RakNetPacket pk = new RakNetPacket(0x08);
         pk.write(buffer);
-        // raknet.sendRawMessage(pk, InetSocketAddress.createUnresolved(address, port)); // Sends the raw bytes from the packet to the specified address
+        raknet.sendNettyMessage(pk, InetSocketAddress.createUnresolved(address, port)); // Sends the raw bytes from the packet to the specified address
     }
 
     public void notifyACK(String identifier, int identifierACK) {

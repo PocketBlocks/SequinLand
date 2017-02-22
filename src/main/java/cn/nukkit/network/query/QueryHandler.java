@@ -3,7 +3,10 @@ package cn.nukkit.network.query;
 import cn.nukkit.Server;
 import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.utils.Binary;
+import io.netty.buffer.Unpooled;
+import net.marfgamer.jraknet.RakNetPacket;
 
+import java.net.InetSocketAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -14,8 +17,8 @@ import java.util.Random;
  */
 public class QueryHandler {
 
-    public static final byte HANDSHAKE = 0x09;
-    public static final byte STATISTICS = 0x00;
+    public static final byte HANDSHAKE = 0x09; // Challenge (Handshake)
+    public static final byte STATISTICS = 0x00; // Request statistics
 
     private final Server server;
     private byte[] lastToken;
@@ -67,41 +70,44 @@ public class QueryHandler {
         }
     }
 
-    public void handle(String address, int port, byte[] packet) {
-        int offset = 2; //skip MAGIC
-        byte packetType = packet[offset++];
-        int sessionID = Binary.readInt(Binary.subBytes(packet, offset, 4));
-        offset += 4;
-        byte[] payload = Binary.subBytes(packet, offset);
-
+    public void handle(InetSocketAddress address, RakNetPacket packet) {
+        // First: 0x09 (Handshake/Challenge)
+        // Second: 0x00 (Statistics)
+        byte packetType = packet.readByte(); // Read query type
+        // Session ID (binary-packed timestamp)
+        int sessionId = packet.readInt();
+        byte[] payload = packet.read(packet.remaining());
+        byte[] reply;
+        
         switch (packetType) {
-            case HANDSHAKE:
-                byte[] reply = Binary.appendBytes(
-                        HANDSHAKE,
-                        Binary.writeInt(sessionID),
-                        getTokenString(this.token, address).getBytes(),
-                        new byte[]{0x00}
-                );
+        case HANDSHAKE:
+            reply = Binary.appendBytes(
+                    HANDSHAKE, // 0x09, this is a reply for the handshake/challenge request
+                    Binary.writeInt(sessionId), // This is the session ID that we received before
+                    getTokenString(this.token, address.getHostString()).getBytes(),
+                    new byte[]{0x00}
+                    );
 
-                this.server.getNetwork().sendPacket(address, port, reply);
+            this.server.getRakNetInterface().getJRakNetServer().sendNettyMessage(Unpooled.copiedBuffer(reply), address);
+            return;
+        case STATISTICS:
+            String token = String.valueOf(Binary.readInt(Binary.subBytes(payload, 0, 4)));
+            if (!token.equals(getTokenString(this.token, address.getHostString())) && !token.equals(getTokenString(this.lastToken, address.getHostString()))) {
                 break;
-            case STATISTICS:
-                String token = String.valueOf(Binary.readInt(Binary.subBytes(payload, 0, 4)));
-                if (!token.equals(getTokenString(this.token, address)) && !token.equals(getTokenString(this.lastToken, address))) {
-                    break;
-                }
+            }
 
-                if (this.timeout < System.currentTimeMillis()) {
-                    this.regenerateInfo();
-                }
-                reply = Binary.appendBytes(
-                        STATISTICS,
-                        Binary.writeInt(sessionID),
-                        payload.length == 8 ? this.longData : this.shortData
-                );
+            if (this.timeout < System.currentTimeMillis()) {
+                this.regenerateInfo();
+            }
+            
+            reply = Binary.appendBytes(
+                    STATISTICS,
+                    Binary.writeInt(sessionId),
+                    payload.length == 8 ? this.longData : this.shortData
+                    );
 
-                this.server.getNetwork().sendPacket(address, port, reply);
-                break;
+            this.server.getRakNetInterface().getJRakNetServer().sendNettyMessage(Unpooled.copiedBuffer(reply), address);
+            break;
         }
     }
 }

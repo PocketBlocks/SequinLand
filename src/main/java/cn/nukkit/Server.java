@@ -61,11 +61,13 @@ import cn.nukkit.scheduler.FileWriteTask;
 import cn.nukkit.scheduler.ServerScheduler;
 import cn.nukkit.utils.*;
 import co.aikar.timings.Timings;
+import net.marfgamer.jraknet.RakNetPacket;
 import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.WatchdogThread;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.util.*;
 
@@ -137,7 +139,8 @@ public class Server {
     private LevelMetadataStore levelMetadata;
 
     private Network network;
-
+    private RakNetInterface rakNetInterface;
+    
     private boolean networkCompressionAsync = true;
     public int networkCompressionLevel = 7;
 
@@ -393,8 +396,11 @@ public class Server {
 
         this.queryRegenerateEvent = new QueryRegenerateEvent(this, 5);
 
-        this.network.registerInterface(new RakNetInterface(this));
-
+        RakNetInterface raknet;
+        
+        this.network.registerInterface(raknet = new RakNetInterface(this));
+        this.rakNetInterface = raknet;
+        
         this.pluginManager.loadPlugins(this.pluginPath);
 
         this.enablePlugins(PluginLoadOrder.STARTUP);
@@ -791,18 +797,18 @@ public class Server {
         this.forceShutdown();
     }
 
-    public void handlePacket(String address, int port, byte[] payload) {
+    public void handleQueryRequest(RakNetPacket packet, InetSocketAddress address) {
         try {
-            if (payload.length > 2 && Arrays.equals(Binary.subBytes(payload, 0, 2), new byte[]{(byte) 0xfe, (byte) 0xfd}) && this.queryHandler != null) {
-                this.queryHandler.handle(address, port, payload);
-            }
+            if (this.queryHandler != null) {
+                this.queryHandler.handle(address, packet);
+            } 
         } catch (Exception e) {
             this.logger.logException(e);
 
-            this.getNetwork().blockAddress(address, 600);
+            this.getNetwork().blockAddress(address.getHostString(), 600);
         }
     }
-
+    
     public void tickProcessor() {
         this.nextTick = System.currentTimeMillis();
         try {
@@ -1732,6 +1738,10 @@ public class Server {
         return network;
     }
 
+    public RakNetInterface getRakNetInterface() {
+        return rakNetInterface;
+    }
+    
     //Revising later...
     public Config getConfig() {
         return this.config;

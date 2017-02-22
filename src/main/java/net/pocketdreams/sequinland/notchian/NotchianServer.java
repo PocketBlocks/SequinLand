@@ -138,7 +138,7 @@ public class NotchianServer {
             @Override
             public void sessionRemoved(SessionRemovedEvent event) {
                 NotchianPlayer player = sessions.get(event.getSession());
-                player.close();
+                player.close("Disconnected", "Disconnected", true);
                 sessions.remove(player);
             }
         });

@@ -16,7 +16,7 @@ public class PEUpdateBlockPacketTranslator extends PocketPacketTranslator {
     @Override
     public Packet[] translate(DataPacket packet, NotchianPlayer player) {
         UpdateBlockPacket pk = (UpdateBlockPacket) packet;
-        
+
         BlockChangeRecord record = new BlockChangeRecord(new Position(pk.x, pk.y, pk.z), new BlockState(pk.blockId, pk.blockData));
         
         ServerBlockChangePacket pcPacket = new ServerBlockChangePacket(record);

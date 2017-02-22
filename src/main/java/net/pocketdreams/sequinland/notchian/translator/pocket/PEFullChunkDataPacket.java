@@ -29,24 +29,27 @@ public class PEFullChunkDataPacket extends PocketPacketTranslator {
         byte[] payload = pk.data;
         BinaryStream stream = new BinaryStream(payload);
         int count = stream.getByte();
-        System.out.println("Section Count: " + count);
         for (int i = 0; i < count; i++) {
             stream.getByte();
             byte[] section = stream.get(10240); // wow!
-            System.out.println("Chunk section loaded");
             
             Chunk chk = new Chunk(true);
-            
-            BinaryStream chunkStream = new BinaryStream(section);
+
+            byte[] blockData = new byte[2048];
+            blockData = Arrays.copyOfRange(section, 4096, 4096 + 2048);
             for (int x = 0; x < 16; x++) {
                 for (int z = 0; z < 16; z++) {
                     // Block IDs
                     int blockIdx = (x << 7) | (z << 3);
-                    for (int y = 0; y < 16; y++) {
-                        int id = chunkStream.getByte();
-                        int meta = section[4096 + (blockIdx | (y >> 1))];
+                    for (int y = 0; y < 16; y += 2) {
+                        int id = section[(blockIdx << 1) | y] & 0xff;
+                        int id2 = section[(blockIdx << 1) | (y + 1)] & 0xff;
+                        int meta = blockData[(blockIdx | (y >> 1))];
+                        int meta2 = meta >> 4;
                         chk.getBlocks().set(x, y, z, new BlockState(id, meta));
+                        chk.getBlocks().set(x, y + 1, z, new BlockState(id2, meta2));
                         chk.getBlockLight().set(x, y, z, 15);
+                        chk.getBlockLight().set(x, y + 1, z, 15);
                     }
                 }
             }
@@ -60,9 +63,7 @@ public class PEFullChunkDataPacket extends PocketPacketTranslator {
             idx++;
         }
 
-        System.out.println("Chunk count: " + chunks.size());
         Column col = new Column(pk.chunkX, pk.chunkZ, chunks.toArray(new Chunk[0]), biomeArray, null);
-        System.out.println(pk.chunkX + ", " + pk.chunkZ + ", " + pk.data.length);
         ServerChunkDataPacket pcPacket = new ServerChunkDataPacket(col);
         return new Packet[] { pcPacket };
     }

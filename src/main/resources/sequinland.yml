@@ -24,3 +24,10 @@ anti-xray:
     - 14
     - 21
     - 73
+# CAUTION: VERY EXPERIMENTAL, MAY BREAK YOUR SERVER
+# Configuration for the Minecraft (Java/Notchian) client support
+minecraft-support:
+    enabled: false
+    server-ip: 0.0.0.0
+    server-port: 25565
+    

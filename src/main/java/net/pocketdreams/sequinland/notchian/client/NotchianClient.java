@@ -1,6 +1,7 @@
 package net.pocketdreams.sequinland.notchian.client;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.spacehq.mc.protocol.data.game.chunk.Chunk;
@@ -94,29 +95,31 @@ public class NotchianClient extends Player {
             pocketPk.radius = 5;
             this.handleDataPacket(pocketPk);
 
+            byte[] biomeData = new byte[256];
+            Arrays.fill(biomeData, (byte) 5);
             Chunk chk = new Chunk(false);
             { 
-                Column col = new Column(0, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                Column col = new Column(0, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, biomeData, new CompoundTag[0]);
                 ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
                 session.send(pkX);
             }
             { 
-                Column col = new Column(1, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                Column col = new Column(1, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, biomeData, new CompoundTag[0]);
                 ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
                 session.send(pkX);
             }
             { 
-                Column col = new Column(-1, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                Column col = new Column(-1, 0, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, biomeData, new CompoundTag[0]);
                 ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
                 session.send(pkX);
             }
             { 
-                Column col = new Column(0, 1, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                Column col = new Column(0, 1, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, biomeData, new CompoundTag[0]);
                 ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
                 session.send(pkX);
             }
             { 
-                Column col = new Column(0, -1, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, new CompoundTag[0]);
+                Column col = new Column(0, -1, new Chunk[] { chk , chk , chk, chk, chk, chk, chk, chk, chk , chk , chk, chk, chk, chk, chk, chk }, biomeData, new CompoundTag[0]);
                 ServerChunkDataPacket pkX = new ServerChunkDataPacket(col);
                 session.send(pkX);
             }

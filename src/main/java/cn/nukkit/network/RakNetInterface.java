@@ -8,20 +8,20 @@ import cn.nukkit.event.server.QueryRegenerateEvent;
 import cn.nukkit.network.protocol.DataPacket;
 import cn.nukkit.network.protocol.ProtocolInfo;
 import cn.nukkit.raknet.protocol.EncapsulatedPacket;
-import cn.nukkit.raknet.protocol.packet.PING_DataPacket;
 import cn.nukkit.utils.Binary;
 import cn.nukkit.utils.MainLogger;
+import io.netty.buffer.ByteBuf;
 import net.marfgamer.jraknet.RakNetPacket;
 import net.marfgamer.jraknet.identifier.MCPEIdentifier;
 import net.marfgamer.jraknet.protocol.Reliability;
 import net.marfgamer.jraknet.server.RakNetServer;
 import net.marfgamer.jraknet.server.RakNetServerListener;
-import net.marfgamer.jraknet.server.ServerPing;
 import net.marfgamer.jraknet.session.RakNetClientSession;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -44,8 +44,6 @@ public class RakNetInterface implements AdvancedSourceInterface {
     private final Map<Integer, String> identifiers = new ConcurrentHashMap<>();
 
     private final Map<String, Integer> identifiersACK = new ConcurrentHashMap<>();
-
-    private int[] channelCounts = new int[256];
 
     public RakNetInterface(Server server) {
         this.server = server;
@@ -70,8 +68,14 @@ public class RakNetInterface implements AdvancedSourceInterface {
 
             // Packet received
             @Override
-            public void handlePacket(RakNetClientSession session, RakNetPacket packet, int channel) {
+            public void handleMessage(RakNetClientSession session, RakNetPacket packet, int channel) {
                 handleRakNetPacket(session.getGloballyUniqueId(), packet);
+            }
+
+            // UT3 server query
+            @Override
+            public void handleNettyMessage(ByteBuf buf, InetSocketAddress address) {
+                // TODO: Implement server query
             }
         });
 

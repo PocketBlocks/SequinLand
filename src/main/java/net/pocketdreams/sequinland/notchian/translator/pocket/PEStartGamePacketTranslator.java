@@ -17,7 +17,7 @@ public class PEStartGamePacketTranslator extends PocketPacketTranslator {
     @Override
     public Packet[] translate(DataPacket packet, NotchianPlayer player) {
         StartGamePacket pk = (StartGamePacket) packet;
-        ServerJoinGamePacket joinPacket = new ServerJoinGamePacket((int) player.getId(), false, GameMode.values()[pk.gamemode], pk.dimension, Difficulty.values()[pk.difficulty], 10, WorldType.DEFAULT, false);
+        ServerJoinGamePacket joinPacket = new ServerJoinGamePacket(1, false, GameMode.values()[pk.gamemode], pk.dimension, Difficulty.values()[pk.difficulty], 10, WorldType.DEFAULT, false);
 
         ServerPlayerPositionRotationPacket rotPacket = new ServerPlayerPositionRotationPacket(pk.x, pk.y, pk.z, 0, 0, 0);
         return new Packet[] { joinPacket, rotPacket };

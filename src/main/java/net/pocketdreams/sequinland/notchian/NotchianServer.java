@@ -8,6 +8,7 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.imageio.ImageIO;
 
@@ -83,7 +84,7 @@ public class NotchianServer {
                         return;
                     }
                 }
-                int clientId = 1;
+                int clientId = (int) (1095216660480L + ThreadLocalRandom.current().nextLong(0, 0x7fffffffL));
                 String identifier = String.valueOf(clientId);
                 NotchianPlayer player = new NotchianPlayer(session, (long) clientId, session.getHost(), session.getPort());
                 sessions.put(session, player);

@@ -12,12 +12,12 @@ import cn.nukkit.network.protocol.StartGamePacket;
 import net.pocketdreams.sequinland.notchian.client.NotchianPlayer;
 import net.pocketdreams.sequinland.notchian.translator.PocketPacketTranslator;
 
-public class PEServerJoinGamePacketTranslator extends PocketPacketTranslator {
+public class PEStartGamePacketTranslator extends PocketPacketTranslator {
 
     @Override
     public Packet[] translate(DataPacket packet, NotchianPlayer player) {
         StartGamePacket pk = (StartGamePacket) packet;
-        ServerJoinGamePacket joinPacket = new ServerJoinGamePacket(0, false, GameMode.values()[pk.gamemode], pk.dimension, Difficulty.values()[pk.difficulty], 10, WorldType.DEFAULT, false);
+        ServerJoinGamePacket joinPacket = new ServerJoinGamePacket((int) player.getId(), false, GameMode.values()[pk.gamemode], pk.dimension, Difficulty.values()[pk.difficulty], 10, WorldType.DEFAULT, false);
 
         ServerPlayerPositionRotationPacket rotPacket = new ServerPlayerPositionRotationPacket(pk.x, pk.y, pk.z, 0, 0, 0);
         return new Packet[] { joinPacket, rotPacket };

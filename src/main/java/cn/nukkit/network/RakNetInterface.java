@@ -87,6 +87,12 @@ public class RakNetInterface implements AdvancedSourceInterface {
                     }
                 }
             }
+            
+            // Print session exception stacktrace
+            @Override
+            public void onSessionException(RakNetClientSession session, Throwable throwable) {
+                throwable.printStackTrace();
+            }
         });
 
         // Start server

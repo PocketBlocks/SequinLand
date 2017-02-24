@@ -1,12 +1,10 @@
 package cn.nukkit.level.format.anvil;
 
-import cn.nukkit.Server;
 import cn.nukkit.nbt.tag.CompoundTag;
 import net.pocketdreams.sequinland.SequinLandConfig;
 import net.pocketdreams.sequinland.utils.SequinUtils;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 /**
  * author: MagicDroidX
@@ -249,7 +247,7 @@ public class ChunkSection implements cn.nukkit.level.format.ChunkSection {
 
     @Override
     public boolean isEmpty() {
-        return Arrays.equals(this.blocks, new byte[4096]);
+        return SequinUtils.isByteArrayEmpty(this.blocks);
     }
 
     @Override

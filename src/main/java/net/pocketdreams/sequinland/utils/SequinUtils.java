@@ -108,4 +108,13 @@ public class SequinUtils {
             updateNearbyBlocks( lvl, x, y, z - 1, radius - 1 );
         }
     }
+    
+    public static boolean isByteArrayEmpty(final byte[] array) {
+        for (byte b : array) {
+            if (b != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

@@ -1,6 +1,5 @@
 SequinLand
 ===================
-![nukkit](https://github.com/Nukkit/Nukkit/blob/master/images/banner.png)
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Lesser General Public License as published by
@@ -15,9 +14,13 @@ SequinLand
 	You should have received a copy of the GNU Lesser General Public License
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-__A Nukkit fork that aims to add new and pretty features to Nukkit! (And sometimes pushes the changes to upstream :wink:)__
-
+<p align="center">
+<b>A Nukkit fork that aims to add new and pretty features to Nukkit!</b>
+<br>
+<img src="https://img.shields.io/github/license/PocketDreams/SequinLand.svg">
+<a href="https://discord.gg/EZArH2G"><img src="https://img.shields.io/badge/discord-sequinland-yellow.svg"></a>
+<img src="https://circleci.com/gh/PocketDreams/SequinLand/tree/master.png">
+</p>
 Introduction
 -------------
 

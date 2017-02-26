@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -183,6 +184,21 @@ public enum TextFormat {
      * @return Text containing the TextFormat.ESCAPE format code character.
      */
     public static String colorize(char altFormatChar, String textToTranslate) {
+        return colorize(altFormatChar, textToTranslate, false);
+    }
+    
+    /**
+     * Translates a string using an alternate format code character into a
+     * string that uses the internal TextFormat.ESCAPE format code
+     * character. The alternate format code character will only be replaced if
+     * it is immediately followed by 0-9, A-F, a-f, K-O, k-o, R or r.
+     *
+     * @param altFormatChar   The alternate format code character to replace. Ex: &
+     * @param textToTranslate Text containing the alternate format code character.
+     * @param resetFormatting If RESET should be added before a color change
+     * @return Text containing the TextFormat.ESCAPE format code character.
+     */
+    public static String colorize(char altFormatChar, String textToTranslate, boolean resetFormatting) {
         char[] b = textToTranslate.toCharArray();
         for (int i = 0; i < b.length - 1; i++) {
             if (b[i] == altFormatChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
@@ -190,7 +206,16 @@ public enum TextFormat {
                 b[i + 1] = Character.toLowerCase(b[i + 1]);
             }
         }
-        return new String(b);
+        String str = new String(b);
+        if (resetFormatting) {
+            Matcher match = Pattern.compile("§([0-9a-f])").matcher(str);
+            int idx = 0;
+            while (match.find()) {
+                str = str.replace("§" + match.group(idx), "§r§" + match.group(idx));
+                idx++;
+            }
+        }
+        return str;
     }
 
     /**
